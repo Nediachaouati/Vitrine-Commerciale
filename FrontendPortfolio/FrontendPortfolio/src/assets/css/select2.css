@@ -1,0 +1,112 @@
+/* Texte/value/placeholder/input */
+.custom-select .custom-select__single-value,
+.custom-select .custom-select__input-container,
+.custom-select .custom-select__input {
+  @apply dark:text-white-dark text-black;
+}
+
+/* Value container padding */
+.custom-select .custom-select__value-container {
+  @apply !pl-4;
+}
+
+/* Control (le select fermé) */
+.custom-select .custom-select__control {
+  @apply bg-white dark:bg-[#1b2e4b]
+         border-[rgb(224,230,237)] dark:border-[#253b5c]
+         shadow-none;
+}
+
+/* ✅ Hover : bordure rouge */
+.custom-select .custom-select__control:hover {
+  @apply border-red-400 dark:border-red-400;
+}
+
+/* =========================
+   MULTI SELECT (chips)
+========================= */
+
+/* Le container des valeurs */
+.custom-select__value-container {
+  @apply !pl-4;
+}
+
+/* Chaque chip */
+.custom-select__multi-value {
+  @apply !bg-red-100 dark:!bg-red-900/30
+         !text-red-700 dark:!text-red-200
+         rounded-md;
+}
+
+/* Le texte dans la chip */
+.custom-select__multi-value__label {
+  @apply !text-red-700 dark:!text-red-200 text-xs font-semibold;
+}
+
+/* Le bouton X pour supprimer une chip */
+.custom-select__multi-value__remove {
+  @apply !text-red-600 dark:!text-red-200
+         hover:!bg-red-200 dark:hover:!bg-red-900/50
+         hover:!text-red-800 dark:hover:!text-red-100
+         rounded-md;
+}
+
+/* Placeholder quand vide */
+.custom-select__placeholder {
+  @apply text-gray-400 dark:text-white-dark/50;
+}
+
+/* Input typing area */
+.custom-select__input-container,
+.custom-select__input {
+  @apply dark:text-white-dark text-black;
+}
+
+/* =========================
+   CONTROL focus/hover rouge
+   (valable single + multi)
+========================= */
+.custom-select__control {
+  @apply bg-white dark:bg-[#1b2e4b]
+         border border-[rgb(224,230,237)] dark:border-[#253b5c]
+         shadow-none;
+}
+
+.custom-select__control:hover {
+  @apply border-red-400;
+}
+
+.custom-select__control--is-focused {
+  @apply border-red-500 ring-1 ring-red-400/40;
+}
+
+/* =========================
+   MENU / OPTIONS rouge
+========================= */
+.custom-select__menu {
+  @apply bg-white dark:bg-[#1b2e4b]
+         border border-[rgb(224,230,237)] dark:border-[#253b5c];
+}
+
+.custom-select__option {
+  @apply !bg-transparent !text-black dark:!text-white-dark;
+}
+
+.custom-select__option--is-focused {
+  @apply !bg-red-50 dark:!bg-red-900/20;
+}
+
+.custom-select__option--is-selected {
+  @apply !bg-red-100 dark:!bg-red-900/30
+         !text-red-700 dark:!text-red-200;
+}
+
+/* =========================
+   INDICATORS
+========================= */
+.custom-select__indicator {
+  @apply dark:text-white-dark text-[#999];
+}
+.custom-select__indicator-separator {
+  @apply hidden;
+}
