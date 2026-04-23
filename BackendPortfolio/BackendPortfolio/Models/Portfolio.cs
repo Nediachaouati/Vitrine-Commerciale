@@ -11,9 +11,7 @@ public partial class Portfolio
 
     public string Title { get; set; } = null!;
 
-    public string Summary { get; set; } = null!;
-
-    public string VersionType { get; set; } = null!;
+    public string? Description { get; set; }
 
     public string Theme { get; set; } = null!;
 
@@ -23,21 +21,23 @@ public partial class Portfolio
 
     public string PublicSlug { get; set; } = null!;
 
-    public DateTime AiGeneratedAt { get; set; }
+    public string? TargetClient { get; set; }
 
     public int ViewCount { get; set; }
 
-    public virtual ICollection<Certification> Certifications { get; set; } = new List<Certification>();
+    public DateTime CreatedAt { get; set; }
+
+    public DateTime UpdatedAt { get; set; }
 
     public virtual Collaborator Collaborator { get; set; } = null!;
 
-    public virtual ICollection<Experience> Experiences { get; set; } = new List<Experience>();
+    public virtual ICollection<PortfolioCertification> PortfolioCertifications { get; set; } = new List<PortfolioCertification>();
 
-    public virtual ICollection<PortfolioSwitch> PortfolioSwitchNewPortfolios { get; set; } = new List<PortfolioSwitch>();
+    public virtual ICollection<PortfolioEducation> PortfolioEducations { get; set; } = new List<PortfolioEducation>();
 
-    public virtual ICollection<PortfolioSwitch> PortfolioSwitchOriginalPortfolios { get; set; } = new List<PortfolioSwitch>();
+    public virtual ICollection<PortfolioExperience> PortfolioExperiences { get; set; } = new List<PortfolioExperience>();
 
-    public virtual ICollection<Project> Projects { get; set; } = new List<Project>();
+    public virtual ICollection<PortfolioProject> PortfolioProjects { get; set; } = new List<PortfolioProject>();
 
-    public virtual ICollection<ShortlistItem> ShortlistItems { get; set; } = new List<ShortlistItem>();
+    public virtual ICollection<PortfolioSkill> PortfolioSkills { get; set; } = new List<PortfolioSkill>();
 }

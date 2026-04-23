@@ -20,14 +20,4 @@ public partial class Client
     public DateTime CreatedAt { get; set; }
 
     public Guid UserId { get; set; }
-
-    public virtual ICollection<ClientNeed> ClientNeeds { get; set; } = new List<ClientNeed>();
-
-    public virtual Manager CreatedByManager { get; set; } = null!;
-
-    public virtual ICollection<Shortlist> Shortlists { get; set; } = new List<Shortlist>();
-
-    public virtual ICollection<Testimonial> Testimonials { get; set; } = new List<Testimonial>();
-
-    public virtual User User { get; set; } = null!;
 }

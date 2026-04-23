@@ -11,38 +11,66 @@ import {
 function* getMyProfileSaga(): SagaIterator {
   try {
     const response = yield call(GetMyProfileApi);
-    yield put(profileApiResponseSuccess(ProfileActionTypes.GET_MY_PROFILE, response.data));
+    console.log('📥 GET profile response:', response.data);
+    yield put(
+      profileApiResponseSuccess(ProfileActionTypes.GET_MY_PROFILE, response.data)
+    );
   } catch (e: any) {
-    yield put(profileApiResponseError(ProfileActionTypes.GET_MY_PROFILE, e?.message ?? e));
+    console.error('❌ GET profile error:', e?.response?.data ?? e?.message);
+    yield put(
+      profileApiResponseError(ProfileActionTypes.GET_MY_PROFILE, e?.message ?? e)
+    );
   }
 }
 
 function* updateMyProfileSaga({ payload }: any): SagaIterator {
   try {
+    console.log('📤 Sending DTO to backend:', payload.dto);
+    
     const response = yield call(UpdateMyProfileApi, payload.dto);
-    yield put(profileApiResponseSuccess(
-      ProfileActionTypes.UPDATE_MY_PROFILE,
-      response.data,
-      ProfileMessages.UPDATE_SUCCESS
-    ));
-    // Recharger le profil complet après mise à jour
+    console.log('📥 UPDATE response.data:', response.data);
+
+    // Message de succès
+    yield put(
+      profileApiResponseSuccess(
+        ProfileActionTypes.UPDATE_MY_PROFILE,
+        response.data,           // tu peux passer response.data si utile
+        ProfileMessages.UPDATE_SUCCESS
+      )
+    );
+
+    // Recharger le profil complet (le plus important !)
     yield put({ type: ProfileActionTypes.GET_MY_PROFILE });
+
   } catch (e: any) {
-    yield put(profileApiResponseError(ProfileActionTypes.UPDATE_MY_PROFILE, e?.message ?? e));
+    console.error('❌ UPDATE error:', e?.response?.data ?? e?.message);
+    yield put(
+      profileApiResponseError(
+        ProfileActionTypes.UPDATE_MY_PROFILE,
+        e?.response?.data?.message ?? e?.message ?? 'Erreur lors de la mise à jour'
+      )
+    );
   }
 }
 
 function* uploadAvatarSaga({ payload }: any): SagaIterator {
   try {
     const response = yield call(UploadAvatarApi, payload.formData);
-    yield put(profileApiResponseSuccess(
-      ProfileActionTypes.UPLOAD_AVATAR,
-      response.data,
-      ProfileMessages.AVATAR_UPLOADED
-    ));
+    yield put(
+      profileApiResponseSuccess(
+        ProfileActionTypes.UPLOAD_AVATAR,
+        response.data ?? null,
+        ProfileMessages.AVATAR_UPLOADED
+      )
+    );
     yield put({ type: ProfileActionTypes.GET_MY_PROFILE });
   } catch (e: any) {
-    yield put(profileApiResponseError(ProfileActionTypes.UPLOAD_AVATAR, e?.message ?? e));
+    yield put(
+      profileApiResponseError(
+        ProfileActionTypes.UPLOAD_AVATAR,
+        e?.response?.data?.message ?? e?.message ?? "Erreur lors de l'upload"
+      )
+    );
   }
 }
 

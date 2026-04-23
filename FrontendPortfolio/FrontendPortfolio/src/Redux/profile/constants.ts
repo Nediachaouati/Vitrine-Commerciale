@@ -8,6 +8,7 @@ export enum ProfileActionTypes {
   UPDATE_MY_PROFILE    = `${PREFIX}UPDATE_MY_PROFILE`,
   UPLOAD_AVATAR        = `${PREFIX}UPLOAD_AVATAR`,
   DELETE_AVATAR        = `${PREFIX}DELETE_AVATAR`,
+  CLEAR_MSG            = `${PREFIX}CLEAR_MSG`,
 }
 
 export const ProfileMessages = {

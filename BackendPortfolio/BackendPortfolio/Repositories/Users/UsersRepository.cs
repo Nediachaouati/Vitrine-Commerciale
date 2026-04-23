@@ -9,10 +9,10 @@ namespace BackendPortfolio.Repositories
 {
     public class UsersRepository : IUsersRepository
     {
-        private readonly IDbContextFactory<DbVitrineContext> _factory;
+        private readonly IDbContextFactory<VitrineDbContext> _factory;
         private readonly IDbExceptionLogger _logger;
 
-        public UsersRepository(IDbContextFactory<DbVitrineContext> factory, IDbExceptionLogger logger)
+        public UsersRepository(IDbContextFactory<VitrineDbContext> factory, IDbExceptionLogger logger)
         {
             _factory = factory;
             _logger = logger;
@@ -204,7 +204,7 @@ namespace BackendPortfolio.Repositories
                 // 2) Créer Collaborator ou Manager vide
                 if (dto.KcRole == "vitrine-collaborator")
                 {
-                    var collab = new Collaborator
+                    var collab = new Models.Collaborator
                     {
                         UserId = keycloakId,
                         JobTitle = string.Empty,
@@ -214,7 +214,7 @@ namespace BackendPortfolio.Repositories
                         GithubUrl = null,       // ✅ nullable
                         AvailabilityStatus = "available",
                         AvailabilityDate = null,       // ✅ nullable
-                        GlobalScore = 0,
+                      
                         IsPublic = false
                     };
                     await _db.Collaborators.AddAsync(collab);
@@ -312,7 +312,7 @@ namespace BackendPortfolio.Repositories
                     .FirstOrDefaultAsync(u => u.UserId == userId);
 
                 if (user == null) return null;
-
+                
                 if (user.Role == "COLLABORATEUR" && user.Collaborators.Any())
                 {
                     var collab = user.Collaborators.First();
@@ -334,7 +334,7 @@ namespace BackendPortfolio.Repositories
                         linkedinUrl = collab.LinkedinUrl,
                         githubUrl = collab.GithubUrl,
                         isPublic = collab.IsPublic,
-                        globalScore = collab.GlobalScore
+                        //globalScore = collab.GlobalScore
                     };
                 }
                 else if (user.Role == "MANAGER" && user.Managers.Any())

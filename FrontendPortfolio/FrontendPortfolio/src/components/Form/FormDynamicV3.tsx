@@ -1,4 +1,3 @@
-/* FormDynamicV3.tsx
 import React, { useEffect, useMemo, useState } from 'react';
 import { Formik, Form, Field, ErrorMessage, useFormikContext, getIn } from 'formik';
 import * as Yup from 'yup';
@@ -8,7 +7,8 @@ import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/themes/material_red.css';
 import Select, { Props as ReactSelectProps } from 'react-select';
 import IconForm from './iconForm';
-import { MethodFormEnum, SubmitPayload } from '../../helpers';
+import { SubmitPayload } from '../../helpers/model/utils/SubmitPayload';
+import { MethodFormEnum } from '../../helpers/model/enum/method.form.enum';
 import ImageUploading, { ImageListType } from 'react-images-uploading';
 import IconX from '../../components/Icon/IconX'; // si tu veux le bouton remove comme ton exemple
 import IconCalendar from '../Icon/IconCalendar';
@@ -99,7 +99,7 @@ const ImageSingleField = (props: { name: string; disabled?: boolean; maxNumber?:
               {imageList?.length ? (
                 imageList.map((image, index) => (
                   <div key={image.dataURL ?? index} className="flex flex-row justify-center items-center w-full  ">
-                    {/* ✅ bouton supprimer }
+                    {/* ✅ bouton supprimer */}
 
                     <div className="relative">
                       <button
@@ -330,7 +330,7 @@ const FormDynamicV3 = (props: FormDynamicProps) => {
       >
         {({ isSubmitting }) => (
           <Form className={`p-6 rounded-lg border border-danger/30 bg-danger/5 ${formClass}`}>
-            <h2 className="text-lg font-semibold text-danger mb-2 text-center">Suppression</h2>
+            
             <p className="text-white-dark text-center mb-6">Vous êtes sur le point de supprimer cet élément. Cette action est irréversible.</p>
 
             <div className="flex justify-end gap-3">
@@ -458,7 +458,7 @@ const FormDynamicV3 = (props: FormDynamicProps) => {
                         disabled={field.disabled}
                         className={`form-input ps-30 placeholder:text-white-dark ${field.className ?? ''}`}
                       />
-                      {/* <IconForm nameIcon={field.name} /> }
+                      {/* <IconForm nameIcon={field.name} /> */}
                     </div>
                   )}
 
@@ -483,4 +483,4 @@ const FormDynamicV3 = (props: FormDynamicProps) => {
   );
 };
 
-export default FormDynamicV3;*/
+export default FormDynamicV3;

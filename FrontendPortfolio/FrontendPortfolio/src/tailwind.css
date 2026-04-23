@@ -751,3 +751,9 @@ pre.hljs {
 .add-chapter:hover .btn-icon-add {
   @apply block;
 }
+
+
+
+.field-label { 
+  @apply block text-xs font-semibold mb-1 text-gray-500 dark:text-gray-400 uppercase tracking-wide; 
+}

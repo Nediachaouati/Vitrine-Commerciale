@@ -18,11 +18,13 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.HttpOverrides;
 using BackendPortfolio.Models;
-using backendPortfolio.Repositories;
 using BackendPortfolio.DTO.kc;
 using backendPortfolio.Utlis;
 using Microsoft.OpenApi.Models;
 using BackendPortfolio.Repositories;
+using BackendPortfolio.Repositories.Collaborator;
+using backendPortfolio.Repositories;
+using BackendPortfolio.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -30,7 +32,7 @@ var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 // =======================================================
 // DB CONTEXT
 // =======================================================
-builder.Services.AddDbContextFactory<DbVitrineContext>(options =>
+builder.Services.AddDbContextFactory<VitrineDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionString")));
 
 // =======================================================
@@ -47,6 +49,7 @@ builder.Services.AddControllers(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     options.JsonSerializerOptions.MaxDepth = 64;
+    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
 });
 
 // =======================================================
@@ -54,12 +57,32 @@ builder.Services.AddControllers(options =>
 // =======================================================
 builder.Services.AddSignalR();
 
+builder.Services.AddHttpClient("OpenRouter", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["OpenRouter:BaseUrl"]!);
+    client.DefaultRequestHeaders.Add(
+        "Authorization",
+        $"Bearer {builder.Configuration["OpenRouter:ApiKey"]}" // ← ici on lit la clé
+    );
+    client.DefaultRequestHeaders.Referrer = new Uri("http://localhost:5026");
+    client.Timeout = TimeSpan.FromMinutes(5);
+});
+builder.Services.AddHttpClient("Gemini", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Gemini:BaseUrl"]!);
+    client.Timeout = TimeSpan.FromMinutes(120);
+});
+
+
+
 // =======================================================
 // DEPENDENCY INJECTION
 // =======================================================
 builder.Services.AddScoped<IDbExceptionLogger, DbExceptionLogger>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
-
+builder.Services.AddScoped<ICollaboratorRepository, CollaboratorRepository>();
+builder.Services.AddScoped<IPortfolioRepository, PortfolioRepository>();
+builder.Services.AddScoped<IPortfolioAiService, PortfolioAiService>();
 
 // =======================================================
 // AUTHORIZATION POLICIES
@@ -179,6 +202,7 @@ builder.Services.AddSwaggerGen(options =>
         {
             options.Authority = issuingAuthority;
             options.Audience = validAudience;
+            
             options.RequireHttpsMetadata = requireHttpsMetadata;
             options.MapInboundClaims = false;
 
@@ -255,7 +279,7 @@ builder.Services.AddSwaggerGen(options =>
                          ctx.Fail("Impossible de créer ou trouver l'utilisateur local");
                          return;
                      }
-
+                    
                      identity.AddClaim(new Claim("local_user_id", userLocal.UserId.ToString()));
                      identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userLocal.UserId.ToString()));
 
@@ -294,10 +318,11 @@ builder.Services.AddSwaggerGen(options =>
          return new KeycloakAdminService(http, opt);
      });
 
-    // =======================================================
-    // BUILD
-    // =======================================================
-    var app = builder.Build();
+
+// =======================================================
+// BUILD
+// =======================================================
+var app = builder.Build();
 
     app.UseMiddleware<GlobalExceptionMiddleware>();
 

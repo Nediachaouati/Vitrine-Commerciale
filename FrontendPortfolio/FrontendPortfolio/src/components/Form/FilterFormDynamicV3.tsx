@@ -1,4 +1,4 @@
-/*import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Formik, Form, Field, ErrorMessage, useFormikContext, getIn } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
@@ -152,7 +152,7 @@ const FilterFormDynamicV3: React.FC<FilterFormDynamicV3Props> = ({ filterConfig,
 
   return (
     <div>
-      {/* overlay }
+      {/* overlay */}
       <div className={`${(showCustomizer && '!block') || ''} fixed inset-0 bg-[black]/60 z-[51] px-4 hidden transition-[display]`} onClick={close} />
 
       <nav
@@ -160,7 +160,7 @@ const FilterFormDynamicV3: React.FC<FilterFormDynamicV3Props> = ({ filterConfig,
           (showCustomizer && 'ltr:!right-0 rtl:!left-0') || ''
         } bg-white fixed ltr:-right-[400px] rtl:-left-[400px] top-0 bottom-0 w-full max-w-[400px] shadow-[5px_0_25px_0_rgba(94,92,154,0.1)] transition-[right] duration-300 z-[51] dark:bg-black p-4`}
       >
-        {/* bouton ouverture }
+        {/* bouton ouverture */}
         <button
           type="button"
           className=" z[10] bg-danger ltr:rounded-tl-full rtl:rounded-tr-full ltr:rounded-bl-full rtl:rounded-br-full absolute ltr:-left-12 rtl:-right-12 -top-10 bottom-20 my-auto w-12 h-10 flex justify-center items-center text-white cursor-pointer"
@@ -170,7 +170,7 @@ const FilterFormDynamicV3: React.FC<FilterFormDynamicV3Props> = ({ filterConfig,
         </button>
 
         <div className="overflow-y-auto overflow-x-hidden perfect-scrollbar h-full">
-          {/* header paramétrable }
+          {/* header paramétrable */}
           <div className="text-center relative pb-5">
             <button type="button" className="absolute top-0 ltr:right-0 rtl:left-0 opacity-30 hover:opacity-100 dark:text-white" onClick={close}>
               <IconX className="w-5 h-5" />
@@ -180,7 +180,7 @@ const FilterFormDynamicV3: React.FC<FilterFormDynamicV3Props> = ({ filterConfig,
             {filterConfig.subtitle && <p className="text-white-dark">{filterConfig.subtitle}</p>}
           </div>
 
-          {/* ---- Formik ---- }
+          {/* ---- Formik ---- */}
           <Formik
             initialValues={initialValues}
             validationSchema={filterConfig.validationSchema ? Yup.object().shape(filterConfig.validationSchema) : undefined}
@@ -192,7 +192,7 @@ const FilterFormDynamicV3: React.FC<FilterFormDynamicV3Props> = ({ filterConfig,
                   {filterConfig.fields.map((field) => (
                     // ✅ CADRE POUR CHAQUE FIELD
                     <div key={field.name} className="border border-dashed border-white-light dark:border-[#1b2e4b] rounded-md mb-3 p-3">
-                      {/* ----- TEXT ----- }
+                      {/* ----- TEXT ----- */}
                       {field.type === 'text' && (
                         <div className={field.className ?? ''}>
                           <label className="block font-medium mb-1 dark:text-white">{field.label}</label>
@@ -201,7 +201,7 @@ const FilterFormDynamicV3: React.FC<FilterFormDynamicV3Props> = ({ filterConfig,
                         </div>
                       )}
 
-                      {/* ----- SELECT SINGLE ----- }
+                      {/* ----- SELECT SINGLE ----- */}
                       {field.type === 'select' && (
                         <div className={field.className ?? ''}>
                           <label className="block font-medium mb-1 dark:text-white">{field.label}</label>
@@ -210,7 +210,7 @@ const FilterFormDynamicV3: React.FC<FilterFormDynamicV3Props> = ({ filterConfig,
                         </div>
                       )}
 
-                      {/* ----- MULTI SELECT ----- }
+                      {/* ----- MULTI SELECT ----- */}
                       {field.type === 'multiselect' && (
                         <div className={field.className ?? ''}>
                           <label className="block font-medium mb-1 dark:text-white">{field.label}</label>
@@ -232,7 +232,7 @@ const FilterFormDynamicV3: React.FC<FilterFormDynamicV3Props> = ({ filterConfig,
                   ))}
                 </div>
 
-                {/* actions }
+                {/* actions */}
                 <div className="flex justify-end gap-2 mt-4">
                   <button type="button" className="btn btn-outline-danger" onClick={() => resetForm()}>
                     Réinitialiser
@@ -250,4 +250,4 @@ const FilterFormDynamicV3: React.FC<FilterFormDynamicV3Props> = ({ filterConfig,
   );
 };
 
-export default FilterFormDynamicV3;*/
+export default FilterFormDynamicV3;

@@ -4,6 +4,9 @@ import Auth            from './auth/reducers';
 import AdminReducer    from './admin/reducers';
 import User            from './user/reducers';
 import ProfileReducer from './profile/reducers';
+import PortfolioReducer from './portfolio/reducer';
+import CollaboratorReducer from './collaborator/reducer';
+
 
 export default combineReducers({
   themeConfig: themeConfigSlice,
@@ -11,4 +14,6 @@ export default combineReducers({
   Admin: AdminReducer,
   User,
   Profile: ProfileReducer,
+  Collaborator: CollaboratorReducer,
+  Portfolio: PortfolioReducer,
 });

@@ -1,14 +1,15 @@
 ﻿using System;
+using backendPortfolio.Repositories;
 using BackendPortfolio.Models;
 
-namespace backendPortfolio.Repositories
+namespace BackendPortfolio.Repositories
 {
     public class DbExceptionLogger : IDbExceptionLogger
     {
-        private readonly IDbContextFactory<DbVitrineContext> _factory;
+        private readonly IDbContextFactory<VitrineDbContext> _factory;
 
 
-        public DbExceptionLogger(IDbContextFactory<DbVitrineContext> factory)
+        public DbExceptionLogger(IDbContextFactory<VitrineDbContext> factory)
         {
             _factory = factory;
         }

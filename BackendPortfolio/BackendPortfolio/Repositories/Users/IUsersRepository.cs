@@ -28,7 +28,6 @@ namespace BackendPortfolio.Repositories
 
 
         //profile
-        // Profile
         Task<object?> GetFullProfileAsync(Guid userId);         
         Task<User?> UpdateFullProfileAsync(Guid userId, UpdateProfileDto dto);
         Task<User?> UpdateAvatarAsync(Guid userId, string? avatarUrl);

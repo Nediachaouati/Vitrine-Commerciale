@@ -6,12 +6,19 @@ export type ProfileActionType = {
   payload: any;
 };
 
-export const profileApiResponseSuccess = (actionType: string, data: any, msg?: string): ProfileActionType => ({
+export const profileApiResponseSuccess = (
+  actionType: string,
+  data: any,
+  msg?: string
+): ProfileActionType => ({
   type: ProfileActionTypes.API_RESPONSE_SUCCESS,
   payload: { actionType, data, msg },
 });
 
-export const profileApiResponseError = (actionType: string, error: any): ProfileActionType => ({
+export const profileApiResponseError = (
+  actionType: string,
+  error: any
+): ProfileActionType => ({
   type: ProfileActionTypes.API_RESPONSE_ERROR,
   payload: { actionType, error },
 });
@@ -33,5 +40,10 @@ export const UploadAvatar = (formData: FormData) => ({
 
 export const DeleteAvatar = () => ({
   type: ProfileActionTypes.DELETE_AVATAR,
+  payload: {},
+});
+
+export const ClearProfileMsg = () => ({
+  type: ProfileActionTypes.CLEAR_MSG,
   payload: {},
 });

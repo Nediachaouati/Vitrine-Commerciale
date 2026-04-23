@@ -3,6 +3,9 @@ import authSaga  from './auth/saga';
 import AdminSaga from './admin/saga';
 import UserSaga  from './user/saga';
 import { watchProfile } from './profile/saga';
+import { watchCollaborator } from './collaborator/saga';
+import { watchPortfolio } from './portfolio/saga';
+
 
 export default function* rootSaga() {
   yield all([
@@ -10,5 +13,7 @@ export default function* rootSaga() {
     AdminSaga(),
     UserSaga(),
     watchProfile(),
+    watchCollaborator(),
+    watchPortfolio()
   ]);
 }

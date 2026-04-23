@@ -4,7 +4,11 @@ import { useRoutes, Navigate } from 'react-router-dom';
 import PrivateRoute from './PrivateRoute';
 import BlankLayout from '../components/Layouts/BlankLayout';
 import { RoleEnum } from '../helpers/model/enum/role.enum';
-const UserProfilePage = lazy(() => import('../pages/tri.training/workspace/UserProfile'));   // ← Changé
+
+
+const UserProfilePage = lazy(() => import('../pages/tri.training/workspace/UserProfile'));   
+const PortfolioBuilder = lazy(() => import('../pages/tri.training/workspace/PortfolioBuilder'));
+const MyPortfolioPage = lazy(() => import('../pages/tri.training/workspace/MyPortfolio'));
 const ContactUs    = lazy(() => import('../pages/tri.training/landing/ContactUs/ContactUs'));
 const AboutUs      = lazy(() => import('../pages/tri.training/landing/AboutUs/AboutUs'));
 const GestionUsers = lazy(() => import('../pages/tri.training/workspace/GestionUsers/GestionUsers'));
@@ -46,6 +50,8 @@ const AllRoutes = () => {
           path: 'profile',
           element: <LoadComponent component={UserProfilePage} />,
         },
+        { path: 'portfolio-builder', element: <LoadComponent component={PortfolioBuilder} /> },
+        { path: 'mon-portfolio',     element: <LoadComponent component={MyPortfolioPage}  /> },
         // ── Ancienne route (gardée pour compatibilité) ──
         {
           path: '/gestionutlilisateurs',

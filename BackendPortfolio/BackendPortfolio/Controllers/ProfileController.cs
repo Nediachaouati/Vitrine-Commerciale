@@ -47,7 +47,7 @@ namespace BackendPortfolio.Controllers
                 return StatusCode(500, new { message = "Erreur interne lors de la récupération du profil" });
             }
         }
-
+       
         // PUT /api/profile
         [HttpPut]
         public async Task<IActionResult> UpdateMyProfile([FromBody] UpdateProfileDto dto)

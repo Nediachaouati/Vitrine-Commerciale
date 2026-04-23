@@ -7,7 +7,7 @@ public partial class Certification
 {
     public int CertificationId { get; set; }
 
-    public int PortfolioId { get; set; }
+    public int CollaboratorId { get; set; }
 
     public string Name { get; set; } = null!;
 
@@ -15,13 +15,15 @@ public partial class Certification
 
     public DateOnly IssueDate { get; set; }
 
-    public DateOnly ExpiryDate { get; set; }
+    public DateOnly? ExpiryDate { get; set; }
 
-    public string CredentialUrl { get; set; } = null!;
+    public string? CredentialUrl { get; set; }
 
-    public string BadgeUrl { get; set; } = null!;
+    public string? BadgeUrl { get; set; }
 
-    public decimal Score { get; set; }
+    public decimal? Score { get; set; }
 
-    public virtual Portfolio Portfolio { get; set; } = null!;
+    public virtual Collaborator Collaborator { get; set; } = null!;
+
+    public virtual ICollection<PortfolioCertification> PortfolioCertifications { get; set; } = new List<PortfolioCertification>();
 }
