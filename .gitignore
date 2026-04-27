@@ -2,3 +2,7 @@
 bin/
 obj/
 node_modules/
+
+# Secrets - ne jamais pusher
+**/appsettings.Development.json
+**/appsettings.Local.json

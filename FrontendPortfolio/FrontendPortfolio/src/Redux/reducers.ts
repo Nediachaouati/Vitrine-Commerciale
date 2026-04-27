@@ -7,6 +7,7 @@ import ProfileReducer from './profile/reducers';
 import PortfolioReducer from './portfolio/reducer';
 import CollaboratorReducer from './collaborator/reducer';
 import ManagerReducer from './manager/reducers';
+import RealisationReducer from './realisation/reducer';
 
 
 export default combineReducers({
@@ -18,4 +19,5 @@ export default combineReducers({
   Collaborator: CollaboratorReducer,
   Portfolio: PortfolioReducer,
   Manager: ManagerReducer,
+  Realisation: RealisationReducer,
 });

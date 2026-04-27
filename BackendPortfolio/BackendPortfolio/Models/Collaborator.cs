@@ -51,5 +51,7 @@ public partial class Collaborator
 
     public virtual ICollection<Project> Projects { get; set; } = new List<Project>();
 
+    public virtual ICollection<Realisation> Realisations { get; set; } = new List<Realisation>();
+
     public virtual User User { get; set; } = null!;
 }

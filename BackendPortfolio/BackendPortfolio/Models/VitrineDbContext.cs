@@ -47,6 +47,8 @@ public partial class VitrineDbContext : DbContext
 
     public virtual DbSet<Project> Projects { get; set; }
 
+    public virtual DbSet<Realisation> Realisations { get; set; }
+
     public virtual DbSet<SkillCatalog> SkillCatalogs { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -529,6 +531,54 @@ public partial class VitrineDbContext : DbContext
                 .HasForeignKey(d => d.CollaboratorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Projects_Collaborators");
+        });
+
+        modelBuilder.Entity<Realisation>(entity =>
+        {
+            entity.HasKey(e => e.RealisationId).HasName("PK__Realisat__789725E28F5F1B7A");
+
+            entity.Property(e => e.RealisationId).HasColumnName("realisation_id");
+            entity.Property(e => e.Category)
+                .HasMaxLength(100)
+                .HasColumnName("category");
+            entity.Property(e => e.ClientName)
+                .HasMaxLength(150)
+                .HasColumnName("client_name");
+            entity.Property(e => e.CollaboratorId).HasColumnName("collaborator_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getutcdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("created_at");
+            entity.Property(e => e.DeliveredAt).HasColumnName("delivered_at");
+            entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.IsPublic)
+                .HasDefaultValue(true)
+                .HasColumnName("is_public");
+            entity.Property(e => e.ManagerId).HasColumnName("manager_id");
+            entity.Property(e => e.ScreenshotUrl)
+                .HasMaxLength(500)
+                .HasColumnName("screenshot_url");
+            entity.Property(e => e.SiteUrl)
+                .HasMaxLength(500)
+                .HasColumnName("site_url");
+            entity.Property(e => e.TechnologiesJson).HasColumnName("technologies_json");
+            entity.Property(e => e.Title)
+                .HasMaxLength(200)
+                .HasDefaultValue("")
+                .HasColumnName("title");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getutcdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("updated_at");
+
+            entity.HasOne(d => d.Collaborator).WithMany(p => p.Realisations)
+                .HasForeignKey(d => d.CollaboratorId)
+                .HasConstraintName("FK_Realisations_Collaborators");
+
+            entity.HasOne(d => d.Manager).WithMany(p => p.Realisations)
+                .HasForeignKey(d => d.ManagerId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Realisations_Managers");
         });
 
         modelBuilder.Entity<SkillCatalog>(entity =>

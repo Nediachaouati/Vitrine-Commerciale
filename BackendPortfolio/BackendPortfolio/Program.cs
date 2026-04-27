@@ -25,6 +25,7 @@ using BackendPortfolio.Repositories;
 using BackendPortfolio.Repositories.Collaborator;
 using backendPortfolio.Repositories;
 using BackendPortfolio.Services;
+using BackendPortfolio.Repositories.Realisations;
 
 var builder = WebApplication.CreateBuilder(args);
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -85,6 +86,7 @@ builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<ICollaboratorRepository, CollaboratorRepository>();
 builder.Services.AddScoped<IPortfolioRepository, PortfolioRepository>();
 builder.Services.AddScoped<IManagerRepository, ManagerRepository>();
+builder.Services.AddScoped<IRealisationRepository, RealisationRepository>();
 
 // ====================Services ===================
 builder.Services.AddScoped<IPortfolioAiService, PortfolioAiService>();
