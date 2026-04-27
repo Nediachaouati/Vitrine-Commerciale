@@ -37,6 +37,7 @@ namespace BackendPortfolio.Repositories
             await using var db = await _factory.CreateDbContextAsync();
             return await db.Portfolios
                 .AsNoTracking()
+                .AsSplitQuery()
                 .Include(p => p.Collaborator).ThenInclude(c => c.User)
                 .Include(p => p.PortfolioSkills)
     .ThenInclude(ps => ps.CollabSkill).ThenInclude(cs => cs.Skill)
@@ -51,12 +52,20 @@ namespace BackendPortfolio.Repositories
         {
             await using var db = await _factory.CreateDbContextAsync();
 
-            // 1. Récupérer le portfolio avec les items visibles
             var portfolio = await db.Portfolios
                 .AsNoTracking()
+                .AsSplitQuery()
                 .Include(p => p.Collaborator).ThenInclude(c => c.User)
+                // ✅ Ajouter les données du collaborateur
+                .Include(p => p.Collaborator).ThenInclude(c => c.CollaboratorSkills)
+                    .ThenInclude(cs => cs.Skill)
+                .Include(p => p.Collaborator).ThenInclude(c => c.Experiences)
+                .Include(p => p.Collaborator).ThenInclude(c => c.Educations)
+                .Include(p => p.Collaborator).ThenInclude(c => c.Certifications)
+                .Include(p => p.Collaborator).ThenInclude(c => c.Projects)
+                // Items du portfolio
                 .Include(p => p.PortfolioSkills)
-    .ThenInclude(ps => ps.CollabSkill).ThenInclude(cs => cs.Skill)
+                    .ThenInclude(ps => ps.CollabSkill).ThenInclude(cs => cs.Skill)
                 .Include(p => p.PortfolioExperiences.Where(pe => pe.IsVisible))
                     .ThenInclude(pe => pe.Experience)
                 .Include(p => p.PortfolioEducations.Where(pe => pe.IsVisible))
@@ -69,7 +78,6 @@ namespace BackendPortfolio.Repositories
 
             if (portfolio == null) return null;
 
-            // 2. Incrémenter ViewCount séparément (sans AsNoTracking)
             await db.Portfolios
                 .Where(p => p.PortfolioId == portfolio.PortfolioId)
                 .ExecuteUpdateAsync(s => s
@@ -78,7 +86,6 @@ namespace BackendPortfolio.Repositories
 
             return portfolio;
         }
-
         public async Task<List<Portfolio>> GetByCollaboratorAsync(int collaboratorId)
         {
             await using var db = await _factory.CreateDbContextAsync();

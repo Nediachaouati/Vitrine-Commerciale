@@ -1,7 +1,7 @@
 // Header.tsx
 import { useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';   // ← Ajout de useDispatch
+import { useSelector, useDispatch } from 'react-redux'; // ← Ajout de useDispatch
 import { useTranslation } from 'react-i18next';
 
 import Dropdown from '../Dropdown';
@@ -36,6 +36,7 @@ const Header = () => {
     const roles = userConnected?.roles || [];
     const isAdmin = roles.includes(RoleEnum.ADMIN);
     const isCollab = roles.includes(RoleEnum.COLLABORATEUR);
+    const isManager = roles.includes(RoleEnum.MANAGER);
 
     // Highlight active link
     useEffect(() => {
@@ -59,24 +60,27 @@ const Header = () => {
                     <div className="horizontal-logo flex items-center ltr:mr-2 rtl:ml-2">
                         <Link to="/home" className="main-logo flex items-center shrink-0">
                             <img className="w-10 ltr:-ml-1 rtl:-mr-1 inline" src="/assets/images/logo_-tri.png" alt="logo" />
-                            <span className="text-2xl ltr:ml-2 rtl:mr-2 font-bold text-gray-600 dark:text-white-light">
-                                VITRINE
-                            </span>
+                            <span className="text-2xl ltr:ml-2 rtl:mr-2 font-bold text-gray-600 dark:text-white-light">VITRINE</span>
                         </Link>
                     </div>
 
                     <div className="sm:flex-1 ltr:sm:ml-0 ltr:ml-auto sm:rtl:mr-0 rtl:mr-auto flex items-center space-x-1.5 lg:space-x-2 rtl:space-x-reverse dark:text-[#d0d2d6] justify-end">
-
                         {/* Menu Public */}
                         <ul className="horizontal-menu flex font-semibold text-black dark:text-white-dark">
                             <li className="menu nav-item relative">
-                                <NavLink to="/home" className="nav-link px-3 py-2">{t('Accueil')}</NavLink>
+                                <NavLink to="/home" className="nav-link px-3 py-2">
+                                    {t('Accueil')}
+                                </NavLink>
                             </li>
                             <li className="menu nav-item relative">
-                                <NavLink to="/aboutus" className="nav-link px-3 py-2">{t('À propos de nous')}</NavLink>
+                                <NavLink to="/aboutus" className="nav-link px-3 py-2">
+                                    {t('À propos de nous')}
+                                </NavLink>
                             </li>
                             <li className="menu nav-item relative">
-                                <NavLink to="/contactus" className="nav-link px-3 py-2">{t('Contactez-nous')}</NavLink>
+                                <NavLink to="/contactus" className="nav-link px-3 py-2">
+                                    {t('Contactez-nous')}
+                                </NavLink>
                             </li>
                         </ul>
 
@@ -144,9 +148,7 @@ const Header = () => {
                                                     <h4 className="text-base dark:text-white">
                                                         {userConnected?.firstName} {userConnected?.lastName}
                                                     </h4>
-                                                    <div className="text-xs bg-primary/10 text-primary rounded px-1 mt-1">
-                                                        {userConnected?.roles?.[0] ?? '—'}
-                                                    </div>
+                                                    <div className="text-xs bg-primary/10 text-primary rounded px-1 mt-1">{userConnected?.roles?.[0] ?? '—'}</div>
                                                 </div>
                                             </div>
                                         </li>
@@ -169,7 +171,9 @@ const Header = () => {
                             <button
                                 type="button"
                                 className="flex-none dark:text-[#d0d2d6] hover:text-primary ltr:ml-2 rtl:mr-2 p-2 rounded-md bg-white-light/40 dark:bg-dark/40 hover:bg-white-light/90 dark:hover:bg-dark/60"
-                                onClick={() => {/* dispatch(loginUser()) */}}
+                                onClick={() => {
+                                    /* dispatch(loginUser()) */
+                                }}
                             >
                                 {t('Connexion')}
                             </button>
@@ -211,6 +215,26 @@ const Header = () => {
                                         Mon portfolio
                                     </NavLink>
                                 </li>
+                            </ul>
+                        </div>
+                    </div>
+                )}
+
+                {isManager && (
+                    <div className="bg-white dark:bg-black border-t border-gray-200 dark:border-white-light/10">
+                        <div className="px-5 py-3">
+                            <ul className="horizontal-menu flex font-semibold text-black dark:text-white-dark gap-x-1 flex-wrap">
+                                <li className="menu nav-item">
+                                    <NavLink to="/dash" className="nav-link px-4 py-2 hover:bg-gray-100 dark:hover:bg-white-light/10 rounded">
+                                        Dashboard
+                                    </NavLink>
+                                </li>
+                                <li className="menu nav-item">
+                                    <NavLink to="/matching" className="nav-link px-4 py-2 hover:bg-gray-100 dark:hover:bg-white-light/10 rounded">
+                                        Matching
+                                    </NavLink>
+                                </li>
+                                
                             </ul>
                         </div>
                     </div>

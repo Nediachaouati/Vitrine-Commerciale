@@ -1,4 +1,4 @@
-import { all, call, put, takeEvery } from 'redux-saga/effects';
+import { all, call, fork, put, takeEvery } from 'redux-saga/effects';
 import { SagaIterator } from '@redux-saga/core';
 import { PortfolioActionTypes, PortfolioMessages } from './constants';
 import { portfolioApiResponseSuccess, portfolioApiResponseError, LoadPortfolio } from './actions';
@@ -14,6 +14,7 @@ import {
   SetPortfolioCertificationsApi,
   SetPortfolioProjectsApi,
   PortfolioChatApi,
+  GetPortfolioBySlugApi,
 } from '../../helpers/api/PortfolioApi';
 
 function* loadMyPortfoliosSaga(): SagaIterator {
@@ -47,6 +48,9 @@ function* updatePortfolioSaga({ payload }: any): SagaIterator {
   try {
     const r = yield call(UpdatePortfolioApi, payload.portfolioId, payload.dto);
     yield put(portfolioApiResponseSuccess(PortfolioActionTypes.UPDATE_PORTFOLIO, r.data, PortfolioMessages.UPDATED));
+    //  Recharger la liste pour synchroniser avec la BDD
+    const portfolios: any = yield call(GetMyPortfoliosApi);
+    yield put(portfolioApiResponseSuccess(PortfolioActionTypes.LOAD_MY_PORTFOLIOS, portfolios.data));
   } catch (e: any) {
     yield put(portfolioApiResponseError(PortfolioActionTypes.UPDATE_PORTFOLIO, e?.message));
   }
@@ -126,6 +130,22 @@ function* chatSendMessageSaga({ payload }: any): SagaIterator {
   }
 }
 
+//public slug 
+function* loadPortfolioBySlug({ payload }: any): Generator {
+  try {
+    const response: any = yield call(GetPortfolioBySlugApi, payload.slug);
+    yield put(portfolioApiResponseSuccess(
+      PortfolioActionTypes.LOAD_PORTFOLIO_BY_SLUG,
+      response.data
+    ));
+  } catch (error: any) {
+    yield put(portfolioApiResponseError(
+      PortfolioActionTypes.LOAD_PORTFOLIO_BY_SLUG,
+      error?.message ?? 'Erreur'
+    ));
+  }
+}
+
 export function* watchPortfolio() {
   yield all([
     takeEvery(PortfolioActionTypes.LOAD_MY_PORTFOLIOS, loadMyPortfoliosSaga),
@@ -139,5 +159,6 @@ export function* watchPortfolio() {
     takeEvery(PortfolioActionTypes.SET_CERTIFICATIONS, setCertificationsSaga),
     takeEvery(PortfolioActionTypes.SET_PROJECTS, setProjectsSaga),
     takeEvery(PortfolioActionTypes.CHAT_SEND_MESSAGE, chatSendMessageSaga),
+        takeEvery(PortfolioActionTypes.LOAD_PORTFOLIO_BY_SLUG, loadPortfolioBySlug),
   ]);
 }

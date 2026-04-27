@@ -15,5 +15,7 @@ public partial class Manager
 
     public Guid UserId { get; set; }
 
+    public virtual ICollection<ClientNeed> ClientNeeds { get; set; } = new List<ClientNeed>();
+
     public virtual User User { get; set; } = null!;
 }

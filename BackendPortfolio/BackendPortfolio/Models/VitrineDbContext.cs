@@ -19,6 +19,8 @@ public partial class VitrineDbContext : DbContext
 
     public virtual DbSet<Client> Clients { get; set; }
 
+    public virtual DbSet<ClientNeed> ClientNeeds { get; set; }
+
     public virtual DbSet<Collaborator> Collaborators { get; set; }
 
     public virtual DbSet<CollaboratorSkill> CollaboratorSkills { get; set; }
@@ -111,6 +113,53 @@ public partial class VitrineDbContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("industry");
             entity.Property(e => e.UserId).HasColumnName("user_id");
+        });
+
+        modelBuilder.Entity<ClientNeed>(entity =>
+        {
+            entity.HasKey(e => e.NeedId);
+
+            entity.Property(e => e.NeedId).HasColumnName("need_id");
+            entity.Property(e => e.AvailabilityRequired)
+                .HasMaxLength(50)
+                .HasColumnName("availability_required");
+            entity.Property(e => e.BudgetRange)
+                .HasMaxLength(100)
+                .HasColumnName("budget_range");
+            entity.Property(e => e.ClientId).HasColumnName("client_id");
+            entity.Property(e => e.ContractType)
+                .HasMaxLength(50)
+                .HasColumnName("contract_type");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("created_at");
+            entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.LocationPreference)
+                .HasMaxLength(200)
+                .HasColumnName("location_preference");
+            entity.Property(e => e.ManagerId).HasColumnName("manager_id");
+            entity.Property(e => e.MinExperienceYears).HasColumnName("min_experience_years");
+            entity.Property(e => e.PreferredSkills).HasColumnName("preferred_skills");
+            entity.Property(e => e.RequiredCertificationsJson).HasColumnName("required_certifications_json");
+            entity.Property(e => e.RequiredSkills).HasColumnName("required_skills");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasDefaultValue("active")
+                .HasColumnName("status");
+            entity.Property(e => e.Title)
+                .HasMaxLength(200)
+                .HasDefaultValue("")
+                .HasColumnName("title");
+
+            entity.HasOne(d => d.Client).WithMany(p => p.ClientNeeds)
+                .HasForeignKey(d => d.ClientId)
+                .HasConstraintName("FK_ClientNeeds_Clients");
+
+            entity.HasOne(d => d.Manager).WithMany(p => p.ClientNeeds)
+                .HasForeignKey(d => d.ManagerId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ClientNeeds_Managers");
         });
 
         modelBuilder.Entity<Collaborator>(entity =>

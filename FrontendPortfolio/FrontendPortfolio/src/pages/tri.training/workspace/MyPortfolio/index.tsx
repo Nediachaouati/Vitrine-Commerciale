@@ -1,8 +1,9 @@
 // pages/MyPortfolio/index.tsx
 import { useEffect, useRef, useState } from 'react';
 import { useRedux } from '../../../../hooks';
-import { LoadMyPortfolios, LoadPortfolio, SelectPortfolio } from '../../../../Redux/portfolio/actions';
+import { LoadMyPortfolios, LoadPortfolio, LoadPortfolioBySlug, SelectPortfolio } from '../../../../Redux/portfolio/actions';
 import { GetMe } from '../../../../Redux/collaborator/actions';
+import { useParams } from 'react-router-dom';
 
 /* ─────────────────────────────────────────────
    Styles
@@ -983,28 +984,39 @@ const PortfolioView = ({ portfolio, collab }: { portfolio: any; collab: any }) =
 ───────────────────────────────────────────── */
 const MyPortfolioPage = () => {
   const { dispatch, appSelector } = useRedux();
+  const { slug } = useParams<{ slug?: string }>(); // ✅ lire le slug si présent
   const hasFetched = useRef(false);
 
-  const collab             = appSelector((state: any) => state.Collaborator?.collab ?? null);
-  const portfolios         = appSelector((state: any) => state.Portfolio?.portfolios ?? []);
-  const selectedPortfolioId= appSelector((state: any) => state.Portfolio?.selectedPortfolioId ?? null);
-  const currentPortfolio   = appSelector((state: any) => state.Portfolio?.currentPortfolio ?? null);
-  const loading            = appSelector((state: any) => state.Portfolio?.loading ?? false);
+  const collab           = appSelector((state: any) => state.Collaborator?.collab ?? null);
+  const portfolios       = appSelector((state: any) => state.Portfolio?.portfolios ?? []);
+  const selectedPortfolioId = appSelector((state: any) => state.Portfolio?.selectedPortfolioId ?? null);
+  const currentPortfolio = appSelector((state: any) => state.Portfolio?.currentPortfolio ?? null);
+  const loading          = appSelector((state: any) => state.Portfolio?.loading ?? false);
+
+  const isPublicMode = !!slug; // ✅ mode public si slug dans l'URL
 
   useEffect(() => {
     if (hasFetched.current) return;
     hasFetched.current = true;
-    dispatch(GetMe());
-    dispatch(LoadMyPortfolios());
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    if (isPublicMode) {
+      // ✅ Mode manager — charger via slug directement
+      dispatch(LoadPortfolioBySlug(slug!));
+    } else {
+      // ✅ Mode collab — charger ses propres portfolios
+      dispatch(GetMe());
+      dispatch(LoadMyPortfolios());
+    }
+  }, [slug]); // eslint-disable-line
 
   useEffect(() => {
+    if (isPublicMode) return; // pas besoin en mode public
     if (!selectedPortfolioId) return;
     if (currentPortfolio?.portfolioId === selectedPortfolioId) return;
     dispatch(LoadPortfolio(selectedPortfolioId));
-  }, [selectedPortfolioId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selectedPortfolioId]); // eslint-disable-line
 
-  const isInitialLoad = loading && portfolios.length === 0;
+  const isInitialLoad = loading && !currentPortfolio && portfolios.length === 0;
 
   if (isInitialLoad) {
     return (
@@ -1015,32 +1027,40 @@ const MyPortfolioPage = () => {
     );
   }
 
-  if (!loading && portfolios.length === 0) {
+  if (!loading && !currentPortfolio && (isPublicMode || portfolios.length === 0)) {
     return (
       <>
         <style>{STYLES}</style>
         <div className="pf-no-data">
-          <h2>Aucun portfolio trouvé</h2>
+          <h2>{isPublicMode ? 'Portfolio introuvable' : 'Aucun portfolio trouvé'}</h2>
           <p style={{ maxWidth: 400, fontSize: 13, marginTop: 8 }}>
-            Tu n'as pas encore de portfolio. Crée-en un dans le Portfolio Builder.
+            {isPublicMode
+              ? 'Ce portfolio n\'existe pas ou n\'est plus disponible.'
+              : 'Tu n\'as pas encore de portfolio. Crée-en un dans le Portfolio Builder.'}
           </p>
-          <a href="/portfolio-builder">Créer mon portfolio →</a>
+          {!isPublicMode && <a href="/portfolio-builder">Créer mon portfolio →</a>}
         </div>
       </>
     );
   }
 
+  // ✅ En mode public, collab vient du portfolio chargé
+  const effectiveCollab = isPublicMode
+    ? currentPortfolio?.collaborator
+    : collab;
+
   return (
     <>
       <style>{STYLES}</style>
 
-      {currentPortfolio && collab ? (
-        <PortfolioView portfolio={currentPortfolio} collab={collab} />
+      {currentPortfolio && effectiveCollab ? (
+        <PortfolioView portfolio={currentPortfolio} collab={effectiveCollab} />
       ) : (
         <div className="pf-spinner"><div className="pf-spinner-ring" /></div>
       )}
 
-      {portfolios.length > 1 && (
+      {/* Switcher seulement en mode collab avec plusieurs portfolios */}
+      {!isPublicMode && portfolios.length > 1 && (
         <div className="pf-switcher">
           <span className="pf-switcher-label">Portfolio</span>
           <select

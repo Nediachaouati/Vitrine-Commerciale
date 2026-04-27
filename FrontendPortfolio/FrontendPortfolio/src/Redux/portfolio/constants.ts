@@ -28,6 +28,9 @@ export enum PortfolioActionTypes {
   SELECT_PORTFOLIO         = `${PREFIX}SELECT_PORTFOLIO`,
   CLEAR_CONVERSATION       = `${PREFIX}CLEAR_CONVERSATION`,
   CLEAR_MSG                = `${PREFIX}CLEAR_MSG`,
+
+  //publisc slug 
+  LOAD_PORTFOLIO_BY_SLUG   = `${PREFIX}LOAD_PORTFOLIO_BY_SLUG`,
 }
 
 export const PortfolioMessages = {

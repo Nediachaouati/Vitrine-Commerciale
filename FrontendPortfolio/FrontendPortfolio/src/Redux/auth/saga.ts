@@ -51,8 +51,8 @@ function* login(): SagaIterator {
 function* logout(): SagaIterator {
   try {
     // ✅ Keycloak logout + redirect vers home
-
-    yield call([keycloak, keycloak.logout], {} as any);
+//changemnt
+    yield call([keycloak, keycloak.logout], {redirectUri: window.location.origin + '/' } as any);
     // Redux success (normalement tu n’arriveras pas ici car redirect)
     yield put(authApiResponseSuccess(AuthActionTypes.LOGOUT_USER, {}));
   } catch (e: any) {

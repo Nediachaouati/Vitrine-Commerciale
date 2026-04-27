@@ -2,6 +2,7 @@
 using BackendPortfolio.DTO;
 using BackendPortfolio.Models;
 using BackendPortfolio.Repositories;
+using BackendPortfolio.Repositories.Collaborator;
 using static BackendPortfolio.DTO.CollaboratorDtos;
 
 namespace BackendPortfolio.Services
@@ -12,7 +13,8 @@ namespace BackendPortfolio.Services
             ChatRequestDto request,
             Collaborator collab,
             Portfolio portfolio,
-            IPortfolioRepository portfolioRepo);
+            IPortfolioRepository portfolioRepo,
+            ICollaboratorRepository collabRepo);
     }
 
     public class PortfolioAiService : IPortfolioAiService
@@ -62,7 +64,8 @@ namespace BackendPortfolio.Services
             ChatRequestDto request,
             Collaborator collab,
             Portfolio portfolio,
-            IPortfolioRepository portfolioRepo)
+            IPortfolioRepository portfolioRepo,
+            ICollaboratorRepository collabRepo)
         {
             var collabContext = BuildCollaboratorContext(collab, portfolio);
             var history = string.Join("\n", request.Messages.Select(m =>
@@ -83,25 +86,31 @@ Expériences visibles : {portfolio.PortfolioExperiences.Count(e => e.IsVisible)}
 Projets visibles : {portfolio.PortfolioProjects.Count(p => p.IsVisible)}
 Certifications visibles : {portfolio.PortfolioCertifications.Count(c => c.IsVisible)}
 Formations visibles : {portfolio.PortfolioEducations.Count(e => e.IsVisible)}
+Bio actuelle : ""{collab.Bio}""
 
 TU PEUX :
 1. Répondre aux questions sur le profil du collaborateur
 2. Modifier la SÉLECTION du portfolio (quoi afficher) en retournant une action JSON
 3. Activer/désactiver des éléments spécifiques par leur id
+TU PEUX AUSSI :
+4. Rédiger ou améliorer la bio du collaborateur (grammaire, équilibre, ton professionnel)
 
-RÉPONDS EN JSON UNIQUEMENT, sans markdown:
+RÈGLE ABSOLUE : Réponds TOUJOURS en JSON pur, sans markdown, sans texte avant ou après.
+
+FORMAT DE RÉPONSE :
 {{
   ""message"": ""ta réponse en langage naturel"",
   ""isComplete"": false,
   ""action"": null
 }}
 
-Si tu veux modifier la sélection, inclus ""action"":
+Si tu modifies des items du portfolio (skills, expériences, etc.) :
 {{
   ""message"": ""J'ai mis à jour les skills affichés"",
   ""isComplete"": false,
   ""action"": {{
     ""type"": ""set_skills"",
+    ""value"": null,
     ""items"": [
       {{""id"": 5, ""isVisible"": true, ""displayOrder"": 1}},
       {{""id"": 8, ""isVisible"": false, ""displayOrder"": 0}}
@@ -109,10 +118,26 @@ Si tu veux modifier la sélection, inclus ""action"":
   }}
 }}
 
-Types d'action possibles : set_skills | set_experiences | set_projects | set_certifications | set_education";
+Si tu modifies ou améliores la bio du collaborateur :
+{{
+  ""message"": ""Voici ta bio raccourcie et corrigée."",
+  ""isComplete"": false,
+  ""action"": {{
+    ""type"": ""update_bio"",
+    ""value"": ""Le nouveau texte de la bio ici."",
+    ""items"": null
+  }}
+}}
+
+Types d'action possibles : set_skills | set_experiences | set_projects | set_certifications | set_education | update_bio | update_profile";
 
             var text = await CallGeminiAsync($"{systemPrompt}\n\nConversation:\n{history}", 1500);
             text = CleanJson(text);
+
+            Console.WriteLine("=== GEMINI RAW RESPONSE ===");
+            Console.WriteLine(text);
+            Console.WriteLine("===========================");
+
 
             try
             {
@@ -122,17 +147,23 @@ Types d'action possibles : set_skills | set_experiences | set_projects | set_cer
                 if (parsed == null) return new ChatResponseDto("Erreur de parsing.", false);
 
                 if (parsed.Action != null)
-                    await ApplyActionAsync(portfolio.PortfolioId, parsed.Action, portfolioRepo);
+                    await ApplyActionAsync(portfolio.PortfolioId, parsed.Action, portfolioRepo , collab.CollaboratorId, 
+                collabRepo);
 
                 return new ChatResponseDto(parsed.Message ?? "", parsed.IsComplete, parsed.Action);
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine("=== PARSE ERROR ===");
+                Console.WriteLine(ex.Message);
+                Console.WriteLine("===================");
                 return new ChatResponseDto("Je n'ai pas pu traiter ta demande. Reformule stp.", false);
             }
+
         }
 
-        private async Task ApplyActionAsync(int portfolioId, GeminiAction action, IPortfolioRepository repo)
+        private async Task ApplyActionAsync(int portfolioId, GeminiAction action, IPortfolioRepository repo ,int collaboratorId,
+    ICollaboratorRepository collabRepo)
         {
             var items = action.Items?.Select(i => new PortfolioItemDto
             {
@@ -148,6 +179,10 @@ Types d'action possibles : set_skills | set_experiences | set_projects | set_cer
                 case "set_projects": await repo.SetProjectsAsync(portfolioId, items); break;
                 case "set_certifications": await repo.SetCertificationsAsync(portfolioId, items); break;
                 case "set_education": await repo.SetEducationsAsync(portfolioId, items); break;
+                case "update_bio":
+                    if (!string.IsNullOrWhiteSpace(action.Value))
+                        await collabRepo.UpdateBioAsync(collaboratorId, action.Value);
+                    break;
             }
         }
 
@@ -211,6 +246,7 @@ Types d'action possibles : set_skills | set_experiences | set_projects | set_cer
     {
         public string? Type { get; set; }
         public List<GeminiActionItem>? Items { get; set; }
+        public string? Value { get; set; }
     }
 
     public class GeminiActionItem

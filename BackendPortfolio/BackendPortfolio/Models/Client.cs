@@ -20,4 +20,6 @@ public partial class Client
     public DateTime CreatedAt { get; set; }
 
     public Guid UserId { get; set; }
+
+    public virtual ICollection<ClientNeed> ClientNeeds { get; set; } = new List<ClientNeed>();
 }

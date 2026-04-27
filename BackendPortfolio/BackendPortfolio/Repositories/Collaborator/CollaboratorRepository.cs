@@ -285,5 +285,14 @@ namespace BackendPortfolio.Repositories.Collaborator
             await db.SaveChangesAsync();
             return true;
         }
+
+        //update bio
+        public async Task UpdateBioAsync(int collaboratorId, string bio)
+        {
+            await using var db = await _factory.CreateDbContextAsync();
+            await db.Collaborators
+                .Where(c => c.CollaboratorId == collaboratorId)
+                .ExecuteUpdateAsync(s => s.SetProperty(c => c.Bio, bio));
+        }
     }
 }

@@ -132,7 +132,7 @@ namespace BackendPortfolio.Controllers
             var portfolio = await _portfolioRepo.GetWithItemsAsync(portfolioId);
             if (portfolio == null) return NotFound(new { message = "Portfolio introuvable" });
 
-            var result = await _ai.ChatAsync(dto, collab, portfolio, _portfolioRepo);
+            var result = await _ai.ChatAsync(dto, collab, portfolio, _portfolioRepo, _collabRepo);
             return Ok(result);
         }
     }

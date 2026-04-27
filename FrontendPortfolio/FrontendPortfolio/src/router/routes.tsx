@@ -1,9 +1,11 @@
 import { lazy, Suspense } from 'react';
 import Root from './Root';
-import { useRoutes, Navigate } from 'react-router-dom';
+import { useRoutes, Navigate, Route } from 'react-router-dom';
 import PrivateRoute from './PrivateRoute';
 import BlankLayout from '../components/Layouts/BlankLayout';
 import { RoleEnum } from '../helpers/model/enum/role.enum';
+import Dashboard from '../pages/tri.training/workspace/ManagerPages/Dashboard';
+import Matching from '../pages/tri.training/workspace/ManagerPages/Matching'; 
 
 
 const UserProfilePage = lazy(() => import('../pages/tri.training/workspace/UserProfile'));   
@@ -15,6 +17,7 @@ const GestionUsers = lazy(() => import('../pages/tri.training/workspace/GestionU
 const DefaultLayout = lazy(() => import('../components/Layouts/DefaultLayout'));
 const Unauthorized  = lazy(() => import('../pages/Pages/Unauthorized'));
 const Home          = lazy(() => import('../pages/tri.training/landing/home/Home'));
+
 
 const loading = () => <div className=""></div>;
 
@@ -52,6 +55,28 @@ const AllRoutes = () => {
         },
         { path: 'portfolio-builder', element: <LoadComponent component={PortfolioBuilder} /> },
         { path: 'mon-portfolio',     element: <LoadComponent component={MyPortfolioPage}  /> },
+       { path: 'portfolio/public/:slug', element: <LoadComponent component={MyPortfolioPage} /> },
+
+         {
+          path: 'dash',
+          element: (
+            <PrivateRoute
+              roles={[RoleEnum.MANAGER]}
+              component={Dashboard as React.ComponentType<any>}
+            />
+          ),
+        },
+        {
+          path: 'matching',
+          element: (
+            <PrivateRoute
+              roles={[RoleEnum.MANAGER]}
+              component={Matching as React.ComponentType<any>}
+            />
+          ),
+        },
+         
+        
         // ── Ancienne route (gardée pour compatibilité) ──
         {
           path: '/gestionutlilisateurs',

@@ -93,3 +93,10 @@ export const ClearPortfolioMsg = () => ({
   type: PortfolioActionTypes.CLEAR_MSG,
   payload: {},
 });
+
+
+//public slug
+export const LoadPortfolioBySlug = (slug: string) => ({
+  type: PortfolioActionTypes.LOAD_PORTFOLIO_BY_SLUG,
+  payload: { slug },
+});

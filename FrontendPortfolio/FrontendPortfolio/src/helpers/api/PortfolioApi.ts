@@ -50,3 +50,7 @@ export const SetPortfolioProjectsApi = (portfolioId: number, dto: SetPortfolioIt
 // Chat IA
 export const PortfolioChatApi = (portfolioId: number, dto: ChatRequestDto) =>
   api.create(`${BASE}/${portfolioId}/chat`, dto);
+
+//public slug
+export const GetPortfolioBySlugApi = (slug: string) =>
+  api.get(`/api/portfolio/public/${slug}`);

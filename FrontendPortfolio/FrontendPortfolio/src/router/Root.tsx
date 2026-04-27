@@ -1,17 +1,31 @@
 import { Navigate } from 'react-router-dom';
-import { useUser } from '../hooks';
+import { useSelector } from 'react-redux';
+import { IRootState } from '../Redux/store';
+import { RoleEnum } from '../helpers/model/enum/role.enum';
 
 const Root = () => {
-  const [loggedInUser] = useUser();
-  const getRootUrl = () => {
-    let url: string = 'home';
+  const { user, userLoggedIn } = useSelector((state: IRootState) => ({
+    user: state.Auth.user,
+    userLoggedIn: state.Auth.userLoggedIn,
+  }));
 
-    return url;
-  };
+  if (!userLoggedIn || !user) {
+    return <Navigate to="/home" replace />;
+  }
 
-  const url = getRootUrl();
+  const roles = user.roles || [];
 
-  return <Navigate to={`/${url}`} />;
+  if (roles.includes(RoleEnum.ADMIN)) {
+    return <Navigate to="/gestionusers" replace />;
+  }
+  if (roles.includes(RoleEnum.MANAGER)) {
+    return <Navigate to="/dash" replace />;
+  }
+  if (roles.includes(RoleEnum.COLLABORATEUR)) {
+    return <Navigate to="/portfolio-builder" replace />;
+  }
+
+  return <Navigate to="/home" replace />;
 };
 
 export default Root;

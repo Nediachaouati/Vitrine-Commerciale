@@ -32,5 +32,8 @@ namespace BackendPortfolio.Repositories.Collaborator
         Task<Project> AddProjectAsync(int collaboratorId, CollaboratorDtos.AddProjectDto dto);
         Task<Project?> UpdateProjectAsync(int projectId, CollaboratorDtos.UpdateProjectDto dto);
         Task<bool> DeleteProjectAsync(int projectId);
+
+        //update bio
+        Task UpdateBioAsync(int collaboratorId, string bio);
     }
 }

@@ -5,6 +5,7 @@ import UserSaga  from './user/saga';
 import { watchProfile } from './profile/saga';
 import { watchCollaborator } from './collaborator/saga';
 import { watchPortfolio } from './portfolio/saga';
+import managerSaga from './manager/saga';
 
 
 export default function* rootSaga() {
@@ -14,6 +15,7 @@ export default function* rootSaga() {
     UserSaga(),
     watchProfile(),
     watchCollaborator(),
-    watchPortfolio()
+    watchPortfolio(),
+    managerSaga(),
   ]);
 }

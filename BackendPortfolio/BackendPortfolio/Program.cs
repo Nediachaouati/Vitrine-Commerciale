@@ -33,7 +33,8 @@ var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 // DB CONTEXT
 // =======================================================
 builder.Services.AddDbContextFactory<VitrineDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionString")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionString"),
+        sqlOptions => sqlOptions.CommandTimeout(120)));
 
 // =======================================================
 // CONTROLLERS
@@ -57,16 +58,17 @@ builder.Services.AddControllers(options =>
 // =======================================================
 builder.Services.AddSignalR();
 
-builder.Services.AddHttpClient("OpenRouter", client =>
+/*
+builder.Services.AddHttpClient("HuggingFace", client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["OpenRouter:BaseUrl"]!);
-    client.DefaultRequestHeaders.Add(
-        "Authorization",
-        $"Bearer {builder.Configuration["OpenRouter:ApiKey"]}" // ← ici on lit la clé
-    );
-    client.DefaultRequestHeaders.Referrer = new Uri("http://localhost:5026");
-    client.Timeout = TimeSpan.FromMinutes(5);
+    client.BaseAddress = new Uri("https://api-inference.huggingface.co/");
+    client.Timeout = TimeSpan.FromSeconds(30);
+});*/
+builder.Services.AddHttpClient("HuggingFace", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(30);
 });
+
 builder.Services.AddHttpClient("Gemini", client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["Gemini:BaseUrl"]!);
@@ -82,7 +84,12 @@ builder.Services.AddScoped<IDbExceptionLogger, DbExceptionLogger>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<ICollaboratorRepository, CollaboratorRepository>();
 builder.Services.AddScoped<IPortfolioRepository, PortfolioRepository>();
+builder.Services.AddScoped<IManagerRepository, ManagerRepository>();
+
+// ====================Services ===================
 builder.Services.AddScoped<IPortfolioAiService, PortfolioAiService>();
+builder.Services.AddScoped<IManagerAiService, ManagerAiService>();
+
 
 // =======================================================
 // AUTHORIZATION POLICIES
@@ -241,6 +248,7 @@ builder.Services.AddSwaggerGen(options =>
                                          var roleValue = role.GetString();
                                          if (!string.IsNullOrEmpty(roleValue))
                                          {
+                                             identity.AddClaim(new Claim(ClaimTypes.Role, roleValue));
                                              identity.AddClaim(new Claim("roles", roleValue));
                                              Console.WriteLine($"[AUTH] Rôle extrait: {roleValue}");
                                          }
