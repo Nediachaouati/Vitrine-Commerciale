@@ -1,7 +1,6 @@
-// Header.tsx
 import { useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux'; // ← Ajout de useDispatch
+import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
 import Dropdown from '../Dropdown';
@@ -27,17 +26,18 @@ const Header = () => {
 
     const themeConfig = useSelector((state: IRootState) => state.themeConfig);
     const isRtl = themeConfig.rtlClass === 'rtl';
-
+    const lastShortlistToken = localStorage.getItem('lastShortlistToken');
     const { userConnected, userLoggedIn } = useSelector((state: IRootState) => ({
         userConnected: state.Auth.user ?? null,
         userLoggedIn: state.Auth.userLoggedIn ?? false,
     }));
 
+    
     const roles = userConnected?.roles || [];
     const isAdmin = roles.includes(RoleEnum.ADMIN);
     const isCollab = roles.includes(RoleEnum.COLLABORATEUR);
     const isManager = roles.includes(RoleEnum.MANAGER);
-
+    const isClient = roles.includes(RoleEnum.CLIENT);
     // Highlight active link
     useEffect(() => {
         const selector = document.querySelector('ul.horizontal-menu a[href="' + window.location.pathname + '"]');
@@ -148,7 +148,6 @@ const Header = () => {
                                                     <h4 className="text-base dark:text-white">
                                                         {userConnected?.firstName} {userConnected?.lastName}
                                                     </h4>
-                                                    <div className="text-xs bg-primary/10 text-primary rounded px-1 mt-1">{userConnected?.roles?.[0] ?? '—'}</div>
                                                 </div>
                                             </div>
                                         </li>
@@ -225,8 +224,13 @@ const Header = () => {
                         <div className="px-5 py-3">
                             <ul className="horizontal-menu flex font-semibold text-black dark:text-white-dark gap-x-1 flex-wrap">
                                 <li className="menu nav-item">
+                                    <NavLink to="/realisations" className="nav-link px-4 py-2 hover:bg-gray-100 dark:hover:bg-white-light/10 rounded">
+                                        Réalisations
+                                    </NavLink>
+                                </li>
+                                <li className="menu nav-item">
                                     <NavLink to="/dash" className="nav-link px-4 py-2 hover:bg-gray-100 dark:hover:bg-white-light/10 rounded">
-                                        Dashboard
+                                        Portfolios
                                     </NavLink>
                                 </li>
                                 <li className="menu nav-item">
@@ -234,15 +238,40 @@ const Header = () => {
                                         Matching
                                     </NavLink>
                                 </li>
+
                                 <li className="menu nav-item">
-                                    <NavLink to="/realisations" className="nav-link px-4 py-2 hover:bg-gray-100 dark:hover:bg-white-light/10 rounded">
-                                        Réalisations
+                                    <NavLink to="/switch" className="nav-link px-4 py-2 hover:bg-gray-100 dark:hover:bg-white-light/10 rounded">
+                                        Switching
+                                    </NavLink>
+                                </li>
+                                <li className="menu nav-item">
+                                    <NavLink to="/shortlists" className="nav-link px-4 py-2 hover:bg-gray-100 dark:hover:bg-white-light/10 rounded">
+                                        Sélection
                                     </NavLink>
                                 </li>
                             </ul>
                         </div>
                     </div>
                 )}
+
+                {isClient && (
+    <div className="bg-white dark:bg-black border-t border-gray-200 dark:border-white-light/10">
+        <div className="px-5 py-3">
+            <ul className="horizontal-menu flex font-semibold text-black dark:text-white-dark gap-x-1 flex-wrap">
+                {lastShortlistToken && (
+                    <li className="menu nav-item">
+                        <NavLink
+                            to={`/shortlist/${lastShortlistToken}`}
+                            className="nav-link px-4 py-2 hover:bg-gray-100 dark:hover:bg-white-light/10 rounded"
+                        >
+                            Sélection
+                        </NavLink>
+                    </li>
+                )}
+            </ul>
+        </div>
+    </div>
+)}
             </div>
         </header>
     );

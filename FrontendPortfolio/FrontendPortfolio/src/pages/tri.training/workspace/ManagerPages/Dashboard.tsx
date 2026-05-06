@@ -1,4 +1,3 @@
-// pages/tri.training/workspace/Manager/Dashboard/index.tsx
 import { useEffect, useRef, useState } from 'react';
 import { useRedux } from '../../../../hooks';
 import { LoadDashboard, SelectCollab } from '../../../../Redux/manager/actions';
@@ -168,9 +167,9 @@ const CollabCard = ({ collab, onSelect }: { collab: CollaboratorSummaryDto; onSe
             {collab.publicSlug ? (
                 <button
                     onClick={handleViewPortfolio}
-                    className="mt-3 w-full text-[11px] py-1.5 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 rounded-lg hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all"
+                    className="mt-3 w-full text-[11px] py-1.5 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-500 hover:text-white hover:border-red-500 transition-all"
                 >
-                    Voir le portfolio →
+                    Voir portfolio →
                 </button>
             ) : collab.portfolioCount > 0 ? (
                 <div className="mt-3 w-full text-[11px] py-1.5 text-center text-gray-300 dark:text-gray-600">Portfolio non public</div>

@@ -10,7 +10,7 @@ import type {
   UpsertRealisationDto,
 } from '../../../../helpers/model/dto/realisation.dto';
 
-const CATEGORIES = ['vitrine', 'ecommerce', 'erp', 'portfolio', 'autre'];
+const CATEGORIES = ['redaction', 'seo', 'web_design', 'developpement', 'integration', 'community_manager'];
 
 const EMPTY_FORM: UpsertRealisationDto = {
   title: '',
@@ -25,6 +25,14 @@ const EMPTY_FORM: UpsertRealisationDto = {
   collaboratorId: undefined,
 };
 
+const CATEGORY_LABELS: Record<string, string> = {
+  redaction:         'Rédaction',
+  seo:               'SEO',
+  web_design:        'Web Design',
+  developpement:     'Développement',
+  integration:       'Intégration',
+  community_manager: 'Community Manager',
+};
 const RealisationForm = () => {
   const { dispatch, appSelector } = useRedux();
 
@@ -114,7 +122,7 @@ const RealisationForm = () => {
               type="text"
               value={form.title}
               onChange={(e) => set('title', e.target.value)}
-              placeholder="Ex: Site vitrine TechCorp"
+              placeholder="Ex: Site TRIWEB"
               className="w-full border border-gray-200 dark:border-[#1b2e4b] rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#0e1726] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
@@ -158,8 +166,8 @@ const RealisationForm = () => {
               >
                 <option value="">Sélectionner...</option>
                 {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
-                ))}
+  <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>
+))}
               </select>
             </div>
           </div>

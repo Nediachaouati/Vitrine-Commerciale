@@ -7,6 +7,7 @@ namespace BackendPortfolio.Controllers
 {
     [Route("api/profile")]
     [ApiController]
+    [Authorize]
     public class ProfileController : ControllerBase
     {
         private readonly IUsersRepository _usersRepo;

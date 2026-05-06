@@ -26,6 +26,11 @@ export enum ManagerActionTypes {
   // Détail collaborateur
   LOAD_COLLABORATOR      = `${PREFIX}LOAD_COLLABORATOR`,
 
+  // ── Tech Switch (Batch) ────────────────────────────────────────
+  BATCH_SWITCH           = `${PREFIX}BATCH_SWITCH`,
+  LOAD_SWITCHED_VIEWS    = `${PREFIX}LOAD_SWITCHED_VIEWS`,
+  DELETE_SWITCHED_VIEW   = `${PREFIX}DELETE_SWITCHED_VIEW`,
+
   // UI
   SELECT_NEED            = `${PREFIX}SELECT_NEED`,
   SELECT_COLLAB          = `${PREFIX}SELECT_COLLAB`,
@@ -37,4 +42,6 @@ export enum ManagerActionTypes {
 export const ManagerMessages = {
   NEED_CREATED: 'Besoin client créé avec succès',
   MATCH_DONE:   'Matching effectué avec succès',
+  SWITCH_DONE:   'Repositionnement effectué avec succès',
+  VIEW_DELETED:  'Vue supprimée',
 } as const;

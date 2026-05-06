@@ -1,5 +1,3 @@
-// pages/tri.training/workspace/ManagerPages/Realisations/index.tsx
-
 import { useEffect, useRef, useState } from 'react';
 import { useRedux } from '../../../../hooks';
 import {
@@ -11,8 +9,6 @@ import {
 import type { RealisationResponseDto } from '../../../../helpers/model/dto/realisation.dto';
 import RealisationForm from './RealisationForm';
 
-// ── Google Material Icons (via CDN — ajouter dans index.html si pas déjà fait)
-// <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
 
 const Icon = ({ name, className = '' }: { name: string; className?: string }) => (
   <span className={`material-icons-round ${className}`} style={{ fontSize: 'inherit' }}>
@@ -21,11 +17,12 @@ const Icon = ({ name, className = '' }: { name: string; className?: string }) =>
 );
 
 const CATEGORY_CONFIG: Record<string, { label: string; color: string; bg: string; icon: string }> = {
-  vitrine:   { label: 'Vitrine',    color: '#3b82f6', bg: '#eff6ff', icon: 'storefront' },
-  ecommerce: { label: 'E-commerce', color: '#10b981', bg: '#ecfdf5', icon: 'shopping_cart' },
-  erp:       { label: 'ERP',        color: '#8b5cf6', bg: '#f5f3ff', icon: 'dashboard' },
-  portfolio: { label: 'Portfolio',  color: '#f97316', bg: '#fff7ed', icon: 'person' },
-  autre:     { label: 'Autre',      color: '#6b7280', bg: '#f9fafb', icon: 'category' },
+  redaction:         { label: 'Rédaction',         color: '#3b82f6', bg: '#eff6ff', icon: 'edit_note' },
+  seo:               { label: 'SEO',               color: '#10b981', bg: '#ecfdf5', icon: 'trending_up' },
+  web_design:        { label: 'Web Design',        color: '#f97316', bg: '#fff7ed', icon: 'palette' },
+  developpement:     { label: 'Développement',     color: '#8b5cf6', bg: '#f5f3ff', icon: 'code' },
+  integration:       { label: 'Intégration',       color: '#06b6d4', bg: '#ecfeff', icon: 'integration_instructions' },
+  community_manager: { label: 'Community Manager', color: '#ec4899', bg: '#fdf2f8', icon: 'groups' },
 };
 
 const Realisations = () => {
@@ -150,11 +147,9 @@ const Realisations = () => {
       {/* ── Grid ─────────────────────────────────────────────────── */}
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-[#1b2e4b] flex items-center justify-center mb-4">
-            <Icon name="web" className="text-[32px] text-gray-300 dark:text-gray-600" />
-          </div>
+          
           <p className="text-base font-semibold text-gray-500 dark:text-gray-400">Aucune réalisation trouvée</p>
-          <p className="text-sm text-gray-400 mt-1">Ajoutez votre premier projet pour le présenter aux clients.</p>
+          
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -211,7 +206,7 @@ const RealisationCard = ({
   onEdit: () => void;
   onDelete: () => void;
 }) => {
-  const cat  = CATEGORY_CONFIG[r.category ?? 'autre'] ?? CATEGORY_CONFIG['autre'];
+  const cat = CATEGORY_CONFIG[r.category ?? ''] ?? CATEGORY_CONFIG['redaction'];
   const date = r.deliveredAt
     ? new Date(r.deliveredAt).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' })
     : null;

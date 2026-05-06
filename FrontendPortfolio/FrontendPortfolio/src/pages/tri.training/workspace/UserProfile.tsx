@@ -21,6 +21,12 @@ const DEGREE_OPTIONS = ['Licence', 'Master', 'Ingénieur', 'BTS', 'Doctorat', 'A
 const avatar = (first: string, last: string) =>
   `https://ui-avatars.com/api/?name=${encodeURIComponent(first + ' ' + last)}&background=e7515a&color=fff&size=200`;
 
+
+const Icon = ({ name, className = '' }: { name: string; className?: string }) => (
+  <span className={`material-icons-round ${className}`} style={{ fontSize: 'inherit' }}>
+    {name}
+  </span>
+);
 const formatDate = (d?: string | null) => d?.slice(0, 10) ?? '';
 
 // ── Composant principal ───────────────────────────────────────────────────
@@ -194,7 +200,9 @@ const ProfileTab = ({ profile, loading, dispatch }: any) => {
       bio: form.bio,
       yearsExperience: Number(form.yearsExperience) || 0,
       linkedinUrl: form.linkedinUrl,
-      githubUrl: form.githubUrl,
+      city: form.city,
+      phone: form.phone,
+     
       availabilityStatus: form.availabilityStatus,
       isPublic: form.isPublic,
     }));
@@ -209,7 +217,7 @@ const ProfileTab = ({ profile, loading, dispatch }: any) => {
         <h3 className="font-bold dark:text-white">Informations personnelles</h3>
         {!editing ? (
           <button onClick={() => setEditing(true)} className="btn btn-danger btn-sm text-xs">
-            ✏️ Modifier
+            <Icon name="edit" className="text-[16px]" /> Modifier
           </button>
         ) : (
           <div className="flex gap-2">
@@ -226,10 +234,13 @@ const ProfileTab = ({ profile, loading, dispatch }: any) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Field label="Prénom" value={form.firstName} editing={editing} onChange={(v) => set('firstName', v)} />
         <Field label="Nom" value={form.lastName} editing={editing} onChange={(v) => set('lastName', v)} />
+        <Field label="City" value={form.city} editing={editing} onChange={(v) => set('city', v)} />
+        <Field label="Phone" value={form.phone} editing={editing} onChange={(v) => set('phone', v)} />
         <Field label="Email" value={form.email} editing={editing} onChange={(v) => set('email', v)} type="email" />
         {editing && (
           <Field label="Nouveau mot de passe" value={form.newPassword || ''} editing={editing} onChange={(v) => set('newPassword', v)} type="password" placeholder="Laisser vide pour ne pas changer" />
         )}
+        
 
         {isCollab && (
           <>
@@ -245,7 +256,7 @@ const ProfileTab = ({ profile, loading, dispatch }: any) => {
             </div>
 
             <Field label="LinkedIn URL" value={form.linkedinUrl} editing={editing} onChange={(v) => set('linkedinUrl', v)} />
-            <Field label="GitHub URL" value={form.githubUrl} editing={editing} onChange={(v) => set('githubUrl', v)} />
+            
 
             <div>
               <label className="block text-xs font-semibold mb-1 text-gray-500 dark:text-gray-400 uppercase">Disponibilité</label>
@@ -639,7 +650,7 @@ const CertForm = ({ form, setForm }: any) => (
 
 // ── Onglet Projets ────────────────────────────────────────────────────────
 const ProjectsTab = ({ collab, loading, dispatch }: any) => {
-  const EMPTY = { title: '', description: '', technologies: '', projectUrl: '', githubUrl: '', screenshotUrl: '', startDate: '', endDate: '', roleInProject: '', isFeatured: false };
+  const EMPTY = { title: '', description: '', technologies: '', projectUrl: '', screenshotUrl: '', startDate: '', endDate: '', roleInProject: '', isFeatured: false };
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<any>({ ...EMPTY });
@@ -647,7 +658,7 @@ const ProjectsTab = ({ collab, loading, dispatch }: any) => {
 
   const parseProj = (f: any) => ({
     title: f.title, description: f.description || undefined, technologies: f.technologies || undefined,
-    projectUrl: f.projectUrl || undefined, githubUrl: f.githubUrl || undefined,
+    projectUrl: f.projectUrl || undefined, 
     screenshotUrl: f.screenshotUrl || undefined,
     startDate: f.startDate || undefined, endDate: f.endDate || undefined,
     roleInProject: f.roleInProject || undefined, isFeatured: !!f.isFeatured,
@@ -693,12 +704,12 @@ const ProjectsTab = ({ collab, loading, dispatch }: any) => {
                   )}
                   <div className="flex gap-3 mt-1">
                     {p.projectUrl && <a href={p.projectUrl} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline">Demo</a>}
-                    {p.githubUrl && <a href={p.githubUrl} target="_blank" rel="noreferrer" className="text-xs text-gray-400 hover:underline">GitHub</a>}
+                    
                   {p.screenshotUrl && <a href={p.screenshotUrl} target="_blank" rel="noreferrer" className="text-xs text-gray-400 hover:underline">Screenshot</a>}
                   </div>
                 </div>
                 <div className="flex gap-2 ml-2 shrink-0">
-                  <button onClick={() => { setEditingId(p.projectId); setEditForm({ title: p.title, description: p.description || '', technologies: p.technologies || '', projectUrl: p.projectUrl || '', githubUrl: p.githubUrl || '', screenshotUrl: p.screenshotUrl || '', startDate: formatDate(p.startDate), endDate: formatDate(p.endDate), roleInProject: p.roleInProject || '', isFeatured: p.isFeatured }); }} className="text-xs text-primary hover:underline">Modifier</button>
+                  <button onClick={() => { setEditingId(p.projectId); setEditForm({ title: p.title, description: p.description || '', technologies: p.technologies || '', projectUrl: p.projectUrl || '', screenshotUrl: p.screenshotUrl || '', startDate: formatDate(p.startDate), endDate: formatDate(p.endDate), roleInProject: p.roleInProject || '', isFeatured: p.isFeatured }); }} className="text-xs text-primary hover:underline">Modifier</button>
                   <button onClick={() => dispatch(DeleteProject(p.projectId))} className="text-xs text-danger hover:underline">Suppr.</button>
                 </div>
               </div>
@@ -719,7 +730,7 @@ const ProjForm = ({ form, setForm }: any) => (
     <div><label className="field-label">Date début</label><input type="date" className="form-input text-sm w-full" value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} /></div>
     <div><label className="field-label">Date fin</label><input type="date" className="form-input text-sm w-full" value={form.endDate} onChange={(e) => setForm({ ...form, endDate: e.target.value })} /></div>
     <div><label className="field-label">URL projet</label><input className="form-input text-sm w-full" placeholder="https://..." value={form.projectUrl} onChange={(e) => setForm({ ...form, projectUrl: e.target.value })} /></div>
-    <div><label className="field-label">GitHub URL</label><input className="form-input text-sm w-full" placeholder="https://github.com/..." value={form.githubUrl} onChange={(e) => setForm({ ...form, githubUrl: e.target.value })} /></div>
+    
     <div><label className="field-label">Screenshot Url</label><input className="form-input text-sm w-full" placeholder="https://..." value={form.screenshotUrl} onChange={(e) => setForm({ ...form, screenshotUrl: e.target.value })} /></div>
     <div className="col-span-2"><label className="field-label">Description</label><textarea className="form-textarea text-sm w-full" rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
     <div className="flex items-center gap-2"><input type="checkbox" checked={form.isFeatured} onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })} className="form-checkbox text-warning" /><span className="text-sm dark:text-white">⭐ Projet mis en avant</span></div>

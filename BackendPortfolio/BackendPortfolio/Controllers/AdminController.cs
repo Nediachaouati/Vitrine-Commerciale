@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BackendPortfolio.Repositories;
 using BackendPortfolio.DTO.kc;
+using BackendPortfolio.Repositories.Email;
 
 namespace BackendPortfolio.Controllers
 {
@@ -10,11 +11,14 @@ namespace BackendPortfolio.Controllers
     {
         private readonly IKeycloakAdminService _keycloak;
         private readonly IUsersRepository _usersRepo;
+        private readonly IEmailRepositorycs _emailRepo;
 
-        public AdminController(IKeycloakAdminService keycloak, IUsersRepository usersRepo)
+
+        public AdminController(IKeycloakAdminService keycloak, IUsersRepository usersRepo, IEmailRepositorycs emailRepo)
         {
             _keycloak = keycloak;
             _usersRepo = usersRepo;
+            _emailRepo = emailRepo;
         }
 
         // GET /api/admin/users
@@ -47,10 +51,11 @@ namespace BackendPortfolio.Controllers
                 if (emailExists)
                     return Conflict(new { message = $"Un user avec l'email {dto.Email} existe déjà" });
 
-                if (dto.KcRole != "vitrine-collaborator" && dto.KcRole != "vitrine-manager")
+                if (dto.KcRole != "vitrine-collaborator" && dto.KcRole != "vitrine-manager" && dto.KcRole != "vitrine-client")
+                    
                     return BadRequest(new
                     {
-                        message = "KcRole invalide. Valeurs acceptées : vitrine-collaborator, vitrine-manager"
+                        message = "KcRole invalide. Valeurs acceptées : vitrine-collaborator, vitrine-manager, vitrine-client"
                     });
 
                 // 1) Créer dans Keycloak
@@ -75,7 +80,22 @@ namespace BackendPortfolio.Controllers
                         message = "User créé dans Keycloak mais échec en BD",
                         keycloakId = kcId
                     });
-
+                // 3) ✅ Envoyer l'email (fire-and-forget pour ne pas bloquer la réponse)
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await _emailRepo.SendWelcomeEmailAsync(
+                            dto.Email, dto.FirstName, dto.LastName,
+                            dto.Username, dto.Password, dto.KcRole
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        // Logger l'erreur sans faire échouer la création
+                        Console.Error.WriteLine($"Email send failed: {ex.Message}");
+                    }
+                });
                 return Ok(new
                 {
                     id = kcId,

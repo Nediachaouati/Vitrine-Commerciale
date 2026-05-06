@@ -7,7 +7,11 @@ import { RoleEnum } from '../helpers/model/enum/role.enum';
 import Dashboard from '../pages/tri.training/workspace/ManagerPages/Dashboard';
 import Matching from '../pages/tri.training/workspace/ManagerPages/Matching';
 import Realisations from '../pages/tri.training/workspace/ManagerPages/Realisations';
+import Switch from '../pages/tri.training/workspace/ManagerPages/Switch';
+import ShortlistsPage from '../pages/tri.training/workspace/ManagerPages/ManagerShortlistPage/Shortlists';
+import ShortlistClientView from '../pages/tri.training/workspace/Client/ShortlistClientView';
 
+const PublicPortfolioViewPage = lazy(() => import('../pages/tri.training/workspace/ManagerPages/PublicPortfolioViewPage'));
 const UserProfilePage = lazy(() => import('../pages/tri.training/workspace/UserProfile'));
 const PortfolioBuilder = lazy(() => import('../pages/tri.training/workspace/PortfolioBuilder'));
 const MyPortfolioPage = lazy(() => import('../pages/tri.training/workspace/MyPortfolio'));
@@ -68,6 +72,22 @@ const AllRoutes = () => {
                     path: 'realisations',
                     element: <PrivateRoute roles={[RoleEnum.MANAGER]} component={Realisations as React.ComponentType<any>} />,
                 },
+                {
+                    path: 'switch',
+                    element: <PrivateRoute roles={[RoleEnum.MANAGER]} component={Switch as React.ComponentType<any>} />,
+                },
+                {
+                    path: 'shortlists',
+                    element: <PrivateRoute roles={[RoleEnum.MANAGER]} component={ShortlistsPage as React.ComponentType<any>} />,
+                },
+                {
+                    path: 'portfolio/view/:shareSlug',
+                    element: <LoadComponent component={PublicPortfolioViewPage} />,
+                },
+                {
+                    path: 'shortlist/:token',
+                    element: <PrivateRoute component={ShortlistClientView as React.ComponentType<any>} />,
+                },
 
                 // ── Ancienne route (gardée pour compatibilité) ──
                 {
@@ -88,6 +108,10 @@ const AllRoutes = () => {
                 },
                 {
                     path: '/gestionusers/managers',
+                    element: <PrivateRoute roles={[RoleEnum.ADMIN]} component={GestionUsers as React.ComponentType<any>} />,
+                },
+                {
+                    path: '/gestionusers/clients',
                     element: <PrivateRoute roles={[RoleEnum.ADMIN]} component={GestionUsers as React.ComponentType<any>} />,
                 },
             ],

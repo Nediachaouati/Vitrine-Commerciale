@@ -1,6 +1,7 @@
 
 import { APICore } from './apiCore';
 import type {
+  BatchSwitchRequestDto,
   CreateClientNeedDto,
   PortfolioFilterDto,
 } from '../model/dto/manager.dto';
@@ -8,15 +9,15 @@ import type {
 const api = new APICore();
 const BASE = '/api/manager';
 
-// ── 5.1 Dashboard ──────────────────────────────────────────────────
+// Dashboard 
 export const GetDashboardApi = () =>
   api.get(`${BASE}/dashboard`);
 
-// ── 5.3 Filtrer portfolios ─────────────────────────────────────────
+// Filtrer portfolios 
 export const FilterPortfoliosApi = (filter: PortfolioFilterDto) =>
   api.create(`${BASE}/portfolios/filter`, filter);
 
-// ── Besoins client ─────────────────────────────────────────────────
+// Besoins client 
 export const CreateClientNeedApi = (dto: CreateClientNeedDto) =>
   api.create(`${BASE}/needs`, dto);
 
@@ -26,25 +27,37 @@ export const GetMyNeedsApi = () =>
 export const GetClientNeedApi = (needId: number) =>
   api.get(`${BASE}/needs/${needId}`);
 
-// ── 5.2 Matching ───────────────────────────────────────────────────
+// Matching 
 export const MatchFromNeedApi = (needId: number) =>
   api.create(`${BASE}/needs/${needId}/match`, {});
 
 export const MatchDirectApi = (dto: CreateClientNeedDto) =>
   api.create(`${BASE}/match`, dto);
 
-// ── 5.4 Critères ───────────────────────────────────────────────────
+// Critères 
 export const GetMatchCriteriaApi = (needId: number, collaboratorId: number) =>
   api.create(`${BASE}/needs/${needId}/match/${collaboratorId}/criteria`, {});
 
-// ── 5.5 Suggestions ────────────────────────────────────────────────
+// Suggestions 
 export const GetSuggestionsApi = (needId: number, collaboratorId: number) =>
   api.create(`${BASE}/needs/${needId}/match/${collaboratorId}/suggestions`, {});
 
-// ── 5.6 Badges ─────────────────────────────────────────────────────
+//  Badges 
 export const GetBadgesApi = (collaboratorId: number) =>
   api.get(`${BASE}/collaborators/${collaboratorId}/badges`);
 
-// ── Détail collaborateur ────────────────────────────────────────────
+//  Détail collaborateur 
 export const GetCollaboratorDetailApi = (collaboratorId: number) =>
   api.get(`${BASE}/collaborators/${collaboratorId}`);
+
+// Tech Switch (Batch) 
+export const BatchSwitchApi = (dto: BatchSwitchRequestDto) =>
+  api.create(`${BASE}/switch/batch`, dto);
+ 
+export const GetSwitchedViewsApi = (tech?: string) => {
+  const params = tech ? `?tech=${encodeURIComponent(tech)}` : '';
+  return api.get(`${BASE}/switch/views${params}`);
+};
+ 
+export const DeleteSwitchedViewApi = (viewId: number) =>
+  api.delete(`${BASE}/switch/views/${viewId}`);

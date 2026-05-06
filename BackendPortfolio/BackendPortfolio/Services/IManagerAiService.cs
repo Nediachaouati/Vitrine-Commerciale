@@ -96,12 +96,15 @@ namespace BackendPortfolio.Services
                 {
                     var (score, breakdown, matched, missing) = ComputeScore(needs, collab);
 
-                    var suggestions = new List<string>();
-                    if (score < 80 && missing.Any())
-                        suggestions = await GetQuickSuggestionsAsync(collab, missing);
+                    // ✅ Toujours générer une phrase narrative (pas seulement si score < 80)
+                    var narrative = await GetNarrativeAsync(needs, collab, score, matched, missing);
+
+                    var suggestions = new List<string> { narrative };
+                    
 
                     return new ManagerDtos.MatchedCollaboratorDto(
                         collab.CollaboratorId,
+                        collab.Portfolios?.FirstOrDefault(p => p.IsActive)?.PortfolioId ?? 0,
                         collab.User?.FirstName ?? "",
                         collab.User?.LastName ?? "",
                         collab.User?.AvatarUrl,
@@ -123,6 +126,7 @@ namespace BackendPortfolio.Services
                     var (score, breakdown, matched, missing) = ComputeScore(needs, collab);
                     return new ManagerDtos.MatchedCollaboratorDto(
                         collab.CollaboratorId,
+                        collab.Portfolios?.FirstOrDefault(p => p.IsActive)?.PortfolioId ?? 0,
                         collab.User?.FirstName ?? "",
                         collab.User?.LastName ?? "",
                         collab.User?.AvatarUrl,
@@ -142,6 +146,73 @@ namespace BackendPortfolio.Services
 
             var results = await Task.WhenAll(tasks);
             return results.OrderByDescending(r => r.MatchScore).ToList();
+        }
+
+        // ── Narrative de positionnement (remplace GetQuickSuggestionsAsync) ──
+        // Génère UNE phrase pour le manager : pourquoi ce profil convient ou pas.
+        // Ex: "Couvre 99% du besoin. Disponible immédiatement. GraphQL absent mais senior — gap estimé à 1 semaine."
+        private async Task<string> GetNarrativeAsync(
+            ManagerDtos.ClientNeedsDto needs,
+            Collaborator collab,
+            double score,
+            List<string> matched,
+            List<string> missing)
+        {
+            try
+            {
+                var availLabel = collab.AvailabilityStatus switch
+                {
+                    "available" => "disponible immédiatement",
+                    "soon" => "disponible sous 3 semaines",
+                    _ => "non disponible"
+                };
+
+                var prompt =
+                    $"Tu es un assistant RH. En une seule phrase française (max 25 mots), " +
+                    $"résume pour un manager si ce profil convient à la mission. " +
+                    $"Profil : {collab.JobTitle}, {collab.YearsExperience} ans d'expérience, {availLabel}. " +
+                    $"Skills matchés : {(matched.Any() ? string.Join(", ", matched) : "aucun")}. " +
+                    $"Skills manquants : {(missing.Any() ? string.Join(", ", missing.Take(3)) : "aucun")}. " +
+                    $"Score global : {Math.Round(score, 0)}%. " +
+                    $"Réponds UNIQUEMENT avec la phrase, sans guillemets, sans ponctuation finale superflue, sans explication.";
+
+                var response = await CallGroqAsync(prompt, 80);
+
+                if (!string.IsNullOrWhiteSpace(response))
+                    return response.Trim().Trim('"');
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erreur GetNarrativeAsync");
+            }
+
+            // Fallback 100% local si Groq échoue
+            return GenerateLocalNarrative(score, missing, collab);
+        }
+
+        // ── Fallback narrative local ──────────────────────────────────────
+        private static string GenerateLocalNarrative(
+            double score,
+            List<string> missing,
+            Collaborator collab)
+        {
+            var availPart = collab.AvailabilityStatus switch
+            {
+                "available" => "Disponible immédiatement.",
+                "soon" => "Disponible sous 3 semaines.",
+                _ => "Non disponible actuellement."
+            };
+
+            if (score >= 85)
+                return $"Couvre {Math.Round(score, 0)}% du besoin. {availPart} Profil fortement recommandé.";
+
+            if (score >= 60 && missing.Any())
+                return $"{missing.First()} manquant — {availPart} À valider avant engagement.";
+
+            if (score >= 60)
+                return $"Profil solide à {Math.Round(score, 0)}%. {availPart}";
+
+            return $"Score insuffisant ({Math.Round(score, 0)}%). {availPart} À considérer uniquement si les autres profils tombent ou si la mission est réduite en périmètre.";
         }
 
         // ── 5.5 Suggestions détaillées ────────────────────────────────────

@@ -22,9 +22,9 @@ export interface CreateClientNeedDto {
   requiredSkills: string[];
   preferredSkills?: string[];
   minYearsExperience?: number;
-  availabilityRequired?: string; // "available" | "soon" | "any"
+  availabilityRequired?: string; 
   requiredCertifications?: string[];
-  contractType?: string; // "CDI" | "freelance" | "stage"
+  contractType?: string; 
   clientId?: number;
 }
 
@@ -60,6 +60,7 @@ export interface MatchBreakdownDto {
 
 export interface MatchedCollaboratorDto {
   collaboratorId: number;
+  portfolioId: number;
   firstName: string;
   lastName: string;
   avatarUrl?: string;
@@ -89,6 +90,7 @@ export interface PortfolioFilterDto {
 
 export interface PortfolioListItemDto {
   portfolioId: number;
+  switchedViewId?: number | null;
   title: string;
   description?: string;
   publicSlug: string;
@@ -107,3 +109,119 @@ export interface ImprovementSuggestionDto {
   currentMatchScore: number;
   potentialMatchScore: number;
 }
+
+// Tech Switch DTOs 
+ 
+export interface BatchSwitchRequestDto {
+  portfolioIds: number[];
+  targetTech: string;
+  missionContext?: string;
+}
+ 
+export interface BatchSwitchResultItemDto {
+  portfolioId: number;
+  collaboratorId: number;
+  collaboratorName: string;
+  originalJobTitle: string;   
+  targetTech: string;
+  generatedTitle: string;
+  generatedBio: string;
+  transferableSkills: string[];
+  relevanceScore: number;      
+  publicShareSlug: string;     
+  switchedViewId: number | null;
+  status: 'success' | 'error';
+}
+ 
+export interface BatchSwitchResponseDto {
+  targetTech: string;
+  missionContext?: string;
+  total: number;
+  successCount: number;
+  errorCount: number;
+  results: BatchSwitchResultItemDto[];
+}
+ 
+export interface SwitchedViewSummaryDto {
+  viewId: number;
+  portfolioId: number;
+  
+  targetTech: string;
+  generatedTitle: string;
+  generatedBio: string;
+  missionContext?: string;
+  status: string;
+  updatedAt: string;
+  collaboratorName: string;
+  originalTitle: string;
+  publicSlug?: string;          // slug original du portfolio collab
+  transferableSkills: string[];
+  relevanceScore?: number;      // ✅ NOUVEAU
+  publicShareSlug?: string;     // ✅ NOUVEAU — lien à partager au client
+}
+ 
+// ── Vue publique (ce que le CLIENT voit) ───────────────────────────
+export interface PublicPortfolioViewDto {
+  targetTech: string;
+  generatedTitle: string;
+  generatedBio: string;
+  missionContext?: string;
+  relevanceScore?: number;
+  collaborator: CollaboratorPublicInfoDto;
+  projects: PublicProjectDto[];
+  skills: PublicSkillDto[];
+  experiences: PublicExperienceDto[];
+  certifications: PublicCertificationDto[];
+}
+ 
+export interface CollaboratorPublicInfoDto {
+  firstName: string;
+  lastName: string;
+  avatarUrl?: string;
+  jobTitle: string;
+  yearsExperience: number;
+  availabilityStatus: string;
+  linkedinUrl?: string;
+  githubUrl?: string;
+}
+ 
+export interface PublicProjectDto {
+  projectId: number;
+  title: string;
+  description?: string;
+  technologies?: string;
+  projectUrl?: string;
+  screenshotUrl?: string;
+  relevanceOrder: number;
+}
+ 
+export interface PublicSkillDto {
+  collabSkillId: number;
+  name: string;
+  level: string;
+  yearsUsed: number;
+  isPrimary: boolean;
+  relevanceOrder: number;
+}
+ 
+export interface PublicExperienceDto {
+  experienceId: number;
+  companyName: string;
+  jobTitle: string;
+  description?: string;
+  startDate: string;
+  endDate?: string;
+  isCurrent: boolean;
+  relevanceOrder: number;
+}
+ 
+export interface PublicCertificationDto {
+  certificationId: number;
+  name: string;
+  issuer: string;
+  issueDate: string;
+  expiryDate?: string;
+  credentialUrl?: string;
+  relevanceOrder: number;
+}
+ 

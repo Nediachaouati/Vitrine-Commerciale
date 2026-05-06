@@ -5,6 +5,8 @@ import type {
   MatchedCollaboratorDto,
   PortfolioListItemDto,
   ImprovementSuggestionDto,
+  BatchSwitchResponseDto,
+  SwitchedViewSummaryDto,
 } from '../../helpers/model/dto/manager.dto';
 
 interface ManagerState {
@@ -22,6 +24,11 @@ interface ManagerState {
   suggestionsLoading: boolean;
   msg: string;
   error: string;
+  // ── Tech Switch ──────────────────────────────────────────────────
+  switchLoading: boolean;
+  switchResult: BatchSwitchResponseDto | null;
+  switchViews: SwitchedViewSummaryDto[];
+  switchViewsLoading: boolean;
 }
 
 const INIT_STATE: ManagerState = {
@@ -39,6 +46,11 @@ const INIT_STATE: ManagerState = {
   suggestionsLoading: false,
   msg: '',
   error: '',
+  // ── Tech Switch ──────────────────────────────────────────────────
+  switchLoading: false,
+  switchResult: null,
+  switchViews: [],
+  switchViewsLoading: false,
 };
 
 export default function ManagerReducer(state = INIT_STATE, action: any): ManagerState {
@@ -61,6 +73,15 @@ export default function ManagerReducer(state = INIT_STATE, action: any): Manager
 
     case ManagerActionTypes.LOAD_SUGGESTIONS:
       return { ...state, suggestionsLoading: true, error: '' };
+    
+    case ManagerActionTypes.BATCH_SWITCH:
+      return { ...state, switchLoading: true, switchResult: null, msg: '', error: '' };
+ 
+    case ManagerActionTypes.LOAD_SWITCHED_VIEWS:
+      return { ...state, switchViewsLoading: true, error: '' };
+ 
+    case ManagerActionTypes.DELETE_SWITCHED_VIEW:
+      return { ...state, switchLoading: true, error: '' };
 
     // ── UI ─────────────────────────────────────────────────────────
     case ManagerActionTypes.SELECT_NEED:
@@ -118,10 +139,39 @@ export default function ManagerReducer(state = INIT_STATE, action: any): Manager
         case ManagerActionTypes.FILTER_PORTFOLIOS:
           return { ...state, loading: false, portfolios: action.payload.data ?? [] };
 
+         // ── Tech Switch ──────────────────────────────────────────
+        case ManagerActionTypes.BATCH_SWITCH:
+          return {
+            ...state,
+            switchLoading: false,
+            switchResult: action.payload.data,
+            msg: action.payload.msg || 'Repositionnement effectué',
+          };
+ 
+        case ManagerActionTypes.LOAD_SWITCHED_VIEWS:
+          return {
+            ...state,
+            switchViewsLoading: false,
+            // ✅ Merge les nouvelles vues avec les existantes pour éviter d'écraser
+            switchViews: action.payload.data ?? [],
+          };
+ 
+        case ManagerActionTypes.DELETE_SWITCHED_VIEW:
+          return {
+            ...state,
+            switchLoading: false,
+            // ✅ Filtre par viewId passé depuis la saga (pas depuis backend)
+            switchViews: state.switchViews.filter(
+              (v) => v.viewId !== action.payload.data?.viewId
+            ),
+            msg: 'Vue supprimée',
+          };
+ 
         default:
           return { ...state, loading: false };
       }
 
+      
     // ── Erreurs ────────────────────────────────────────────────────
     case ManagerActionTypes.API_RESPONSE_ERROR:
       return {
@@ -129,6 +179,8 @@ export default function ManagerReducer(state = INIT_STATE, action: any): Manager
         loading: false,
         matchLoading: false,
         suggestionsLoading: false,
+        switchLoading: false,      
+        switchViewsLoading: false,
         error: action.payload.error || 'Erreur',
         msg: '',
       };

@@ -31,6 +31,8 @@ public partial class Portfolio
 
     public virtual Collaborator Collaborator { get; set; } = null!;
 
+    public virtual ICollection<ManagerPortfolioView> ManagerPortfolioViews { get; set; } = new List<ManagerPortfolioView>();
+
     public virtual ICollection<PortfolioCertification> PortfolioCertifications { get; set; } = new List<PortfolioCertification>();
 
     public virtual ICollection<PortfolioEducation> PortfolioEducations { get; set; } = new List<PortfolioEducation>();
@@ -40,4 +42,6 @@ public partial class Portfolio
     public virtual ICollection<PortfolioProject> PortfolioProjects { get; set; } = new List<PortfolioProject>();
 
     public virtual ICollection<PortfolioSkill> PortfolioSkills { get; set; } = new List<PortfolioSkill>();
+
+    public virtual ICollection<ShortlistItem> ShortlistItems { get; set; } = new List<ShortlistItem>();
 }

@@ -1,4 +1,3 @@
-// src/helpers/model/dto/update-profile.dto.ts
 export interface UpdateProfileDto {
   // Champs communs
   firstName?: string;
@@ -10,11 +9,15 @@ export interface UpdateProfileDto {
   bio?: string;
   yearsExperience?: number;
   linkedinUrl?: string;
+  city?: string;
+  phone?: string;
   githubUrl?: string;
   availabilityStatus?: string;
-  availabilityDate?: string; // DateOnly → string en JSON
+  availabilityDate?: string; 
   isPublic?: boolean;
 
   // Champs Manager
   department?: string;
+
+  company_name?: string;
 }

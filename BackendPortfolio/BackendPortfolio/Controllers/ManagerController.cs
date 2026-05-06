@@ -16,15 +16,19 @@ namespace BackendPortfolio.Controllers
         private readonly IManagerRepository _repo;
         private readonly IManagerAiService _ai;
         private readonly IUsersRepository _users;
+        private readonly IManagerBatchSwitchService _batchSwitch;
+
 
         public ManagerController(
             IManagerRepository repo,
             IManagerAiService ai,
-            IUsersRepository users)
+            IUsersRepository users,
+            IManagerBatchSwitchService batchSwitch)
         {
             _repo = repo;
             _ai = ai;
             _users = users;
+            _batchSwitch = batchSwitch;
         }
 
         // ── Helpers ──────────────────────────────────────────────────────
@@ -281,6 +285,61 @@ namespace BackendPortfolio.Controllers
                 Certifications = collab.Certifications,
                 Projects = collab.Projects
             });
+        }
+
+        // ── POST /api/manager/switch/batch 
+        [HttpPost("switch/batch")]
+        public async Task<IActionResult> BatchSwitch(
+            [FromBody] ManagerDtos.BatchSwitchRequestDto dto)
+        {
+            if (dto.PortfolioIds == null || !dto.PortfolioIds.Any())
+                return BadRequest(new { message = "Aucun portfolio sélectionné." });
+
+            if (dto.PortfolioIds.Count > 50)
+                return BadRequest(new { message = "Maximum 50 portfolios par batch." });
+
+            if (string.IsNullOrWhiteSpace(dto.TargetTech))
+                return BadRequest(new { message = "TargetTech requis." });
+
+            var manager = await GetCurrentManagerAsync();
+            if (manager == null) return Unauthorized();
+
+            var result = await _batchSwitch.BatchSwitchAsync(manager.ManagerId, dto);
+            return Ok(result);
+        }
+
+        // ── GET /api/manager/switch/views 
+        [HttpGet("switch/views")]
+        public async Task<IActionResult> GetSwitchedViews([FromQuery] string? tech)
+        {
+            var manager = await GetCurrentManagerAsync();
+            if (manager == null) return Unauthorized();
+
+            var views = await _repo.GetSwitchedViewsByManagerAsync(manager.ManagerId, tech);
+
+            return Ok(views.Select(v => new ManagerDtos.SwitchedViewSummaryDto(
+                v.ViewId,
+                v.PortfolioId,
+                v.TargetTech,
+                v.GeneratedTitle ?? "",
+                v.GeneratedBio ?? "",
+                v.MissionContext,
+                v.Status,
+                v.UpdatedAt,
+                $"{v.Portfolio.Collaborator.User?.FirstName} {v.Portfolio.Collaborator.User?.LastName}".Trim(),
+                v.Portfolio.Collaborator.JobTitle ?? "",
+                v.Portfolio.PublicSlug,
+                JsonSerializer.Deserialize<List<string>>(v.TransferableSkillsJson ?? "[]") ?? new(),
+                v.RelevanceScore,
+                v.PublicShareSlug
+            )));
+        }
+        // ── DELETE /api/manager/switch/views/{viewId} 
+        [HttpDelete("switch/views/{viewId:int}")]
+        public async Task<IActionResult> DeleteSwitchedView(int viewId)
+        {
+            var ok = await _repo.DeleteSwitchedViewAsync(viewId);
+            return ok ? Ok(new { message = "Vue supprimée." }) : NotFound();
         }
     }
 }

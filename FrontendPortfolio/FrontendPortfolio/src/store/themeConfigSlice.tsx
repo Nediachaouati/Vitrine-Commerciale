@@ -137,7 +137,7 @@ const themeConfigSlice = createSlice({
     },
 
     setPageTitle(state, { payload }) {
-      document.title = `${payload} | TRI TRAINING`;
+      document.title = `${payload} | TRI VITRINE`;
     },
   },
 });

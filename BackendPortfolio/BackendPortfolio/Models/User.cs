@@ -29,6 +29,8 @@ public partial class User
 
     public DateTime? DeletedAt { get; set; }
 
+    public virtual ICollection<Client> Clients { get; set; } = new List<Client>();
+
     public virtual ICollection<Collaborator> Collaborators { get; set; } = new List<Collaborator>();
 
     public virtual ICollection<Manager> Managers { get; set; } = new List<Manager>();

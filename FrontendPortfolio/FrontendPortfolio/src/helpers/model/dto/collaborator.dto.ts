@@ -1,4 +1,3 @@
-// helpers/model/dto/collaborator.dto.ts
 
 export interface AddSkillDto {
   skillId: number;
@@ -17,7 +16,7 @@ export interface AddExperienceDto {
   companyName: string;
   jobTitle: string;
   description?: string;
-  startDate: string; // "YYYY-MM-DD"
+  startDate: string; 
   endDate?: string | null;
   isCurrent: boolean;
   location?: string;

@@ -17,7 +17,11 @@ public partial class Manager
 
     public virtual ICollection<ClientNeed> ClientNeeds { get; set; } = new List<ClientNeed>();
 
+    public virtual ICollection<ManagerPortfolioView> ManagerPortfolioViews { get; set; } = new List<ManagerPortfolioView>();
+
     public virtual ICollection<Realisation> Realisations { get; set; } = new List<Realisation>();
+
+    public virtual ICollection<Shortlist> Shortlists { get; set; } = new List<Shortlist>();
 
     public virtual User User { get; set; } = null!;
 }

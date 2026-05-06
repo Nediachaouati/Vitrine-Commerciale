@@ -1,4 +1,3 @@
-// helpers/api/CollaboratorApi.ts
 import { APICore } from './apiCore';
 import type {
   AddSkillDto, UpdateSkillDto,

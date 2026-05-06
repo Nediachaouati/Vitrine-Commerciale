@@ -210,10 +210,12 @@ namespace BackendPortfolio.Repositories
                         JobTitle = string.Empty,
                         Bio = string.Empty,
                         YearsExperience = 0,
-                        LinkedinUrl = null,       // ✅ nullable
-                        GithubUrl = null,       // ✅ nullable
+                        LinkedinUrl = null, 
+                        City=null,
+                        Phone = null,
+                        GithubUrl = null,       
                         AvailabilityStatus = "available",
-                        AvailabilityDate = null,       // ✅ nullable
+                        AvailabilityDate = null,       
                       
                         IsPublic = false
                     };
@@ -229,6 +231,20 @@ namespace BackendPortfolio.Repositories
                         CreatedAt = DateTime.UtcNow
                     };
                     await _db.Managers.AddAsync(manager);
+                }
+
+                else if (dto.KcRole == "vitrine-client")
+                {
+                    var client = new Client
+                    {
+                        UserId = keycloakId,
+                        CompanyName = string.Empty,
+                        Country = null,       
+                        Industry = null,     
+                        ContactPhone = null,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    await _db.Clients.AddAsync(client);
                 }
 
                 await _db.SaveChangesAsync();
@@ -332,6 +348,8 @@ namespace BackendPortfolio.Repositories
                         availabilityStatus = collab.AvailabilityStatus,
                         availabilityDate = collab.AvailabilityDate,
                         linkedinUrl = collab.LinkedinUrl,
+                        city=collab.City,
+                        phone=collab.Phone,
                         githubUrl = collab.GithubUrl,
                         isPublic = collab.IsPublic,
                         //globalScore = collab.GlobalScore
@@ -352,6 +370,24 @@ namespace BackendPortfolio.Repositories
 
                         department = manager.Department,
                         managedProfilesCount = manager.ManagedProfilesCount
+                    };
+                }
+
+                else if (user.Role == "CLIENT" && user.Clients.Any())
+                {
+                    var client = user.Clients.First();
+                    return new
+                    {
+                        user.UserId,
+                        user.Email,
+                        user.FirstName,
+                        user.LastName,
+                        user.AvatarUrl,
+                        user.Role,
+                        user.IsActive,
+
+                        country = client.Country,
+                        company_name = client.CompanyName
                     };
                 }
 
@@ -420,6 +456,12 @@ namespace BackendPortfolio.Repositories
                         if (!string.IsNullOrWhiteSpace(dto.LinkedinUrl) && collab.LinkedinUrl != dto.LinkedinUrl)
                         { collab.LinkedinUrl = dto.LinkedinUrl; changed = true; }
 
+                        if (!string.IsNullOrWhiteSpace(dto.City) && collab.City != dto.City)
+                        { collab.City = dto.City; changed = true; }
+
+                        if (!string.IsNullOrWhiteSpace(dto.Phone) && collab.Phone != dto.Phone)
+                        { collab.Phone = dto.Phone; changed = true; }
+
                         if (!string.IsNullOrWhiteSpace(dto.GithubUrl) && collab.GithubUrl != dto.GithubUrl)
                         { collab.GithubUrl = dto.GithubUrl; changed = true; }
 
@@ -446,6 +488,22 @@ namespace BackendPortfolio.Repositories
                         if (!string.IsNullOrWhiteSpace(dto.Department) && manager.Department != dto.Department)
                         {
                             manager.Department = dto.Department;
+                            changed = true;
+                        }
+                    }
+                }
+
+                else if (user.Role == "CLIENT")
+                {
+                    // Charger directement depuis le contexte pour garantir le tracking
+                    var client = await _db.Clients
+                        .FirstOrDefaultAsync(m => m.UserId == userId);
+
+                    if (client != null)
+                    {
+                        if (!string.IsNullOrWhiteSpace(dto.CompanyName) && client.CompanyName != dto.CompanyName)
+                        {
+                            client.CompanyName = dto.CompanyName;
                             changed = true;
                         }
                     }

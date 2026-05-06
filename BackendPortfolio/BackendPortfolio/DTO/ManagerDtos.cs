@@ -2,7 +2,7 @@
 {
     public static class ManagerDtos
     {
-        // ── 5.1 Dashboard ──────────────────────────────────────────────
+        // ── Dashboard ──────────────────────────────────────────────────
         public record CollaboratorSummaryDto(
             int CollaboratorId,
             string FirstName,
@@ -12,29 +12,28 @@
             string Bio,
             int YearsExperience,
             string AvailabilityStatus,
-            DateOnly? AvailabilityDate,   // ✅ CORRIGÉ : DateOnly? aligné avec le modèle Collaborator
+            DateOnly? AvailabilityDate,
             bool IsPublic,
-            List<string> Badges,          // 5.6
+            List<string> Badges,
             List<string> PrimarySkills,
             int PortfolioCount,
             int ViewCount,
             string? PublicSlug
         );
 
-        // ── 5.2 Besoins client - création (persisté en BDD) ───────────
+        // ── Besoins client ─────────────────────────────────────────────
         public record CreateClientNeedDto(
             string Title,
             string Description,
             List<string> RequiredSkills,
             List<string>? PreferredSkills,
             int? MinYearsExperience,
-            string? AvailabilityRequired,      // "available" | "soon" | "any"
+            string? AvailabilityRequired,
             List<string>? RequiredCertifications,
-            string? ContractType,              // "CDI" | "freelance" | "stage"
-            int? ClientId                       // optionnel : lier à un client existant
+            string? ContractType,
+            int? ClientId
         );
 
-        // Réponse après création/lecture d'un besoin client
         public record ClientNeedResponseDto(
             int NeedId,
             int ManagerId,
@@ -51,7 +50,6 @@
             DateTime CreatedAt
         );
 
-        // DTO interne pour le moteur de scoring (parsé depuis ClientNeed)
         public record ClientNeedsDto(
             string Title,
             string Description,
@@ -63,9 +61,10 @@
             string? ContractType
         );
 
-        // ── Résultat de matching (5.2 + 5.4 + 5.5) ───────────────────
+        // ── Matching ───────────────────────────────────────────────────
         public record MatchedCollaboratorDto(
             int CollaboratorId,
+            int PortfolioId,
             string FirstName,
             string LastName,
             string? AvatarUrl,
@@ -81,7 +80,6 @@
             string? PublicSlug
         );
 
-        // ── 5.4 Détail des critères ────────────────────────────────────
         public record MatchBreakdownDto(
             double SkillScore,
             double ExperienceScore,
@@ -92,11 +90,11 @@
 
         public record MatchCriterionDto(
             string Criterion,
-            string Status,   // "matched" | "partial" | "missing"
+            string Status,
             string Detail
         );
 
-        // ── 5.3 Filtres portfolios ─────────────────────────────────────
+        // ── Filtres portfolios ─────────────────────────────────────────
         public record PortfolioFilterDto(
             string? Search,
             List<string>? Skills,
@@ -105,8 +103,8 @@
             int? MaxYearsExperience,
             string? Theme,
             string? Language,
-            string? SortBy,    // "views" | "name" | "date"
-            string? SortDir    // "asc" | "desc"
+            string? SortBy,
+            string? SortDir
         );
 
         public record PortfolioListItemDto(
@@ -122,7 +120,7 @@
             CollaboratorSummaryDto Collaborator
         );
 
-        // ── 5.5 Suggestions d'amélioration ────────────────────────────
+        // ── Suggestions ────────────────────────────────────────────────
         public record ImprovementSuggestionDto(
             int CollaboratorId,
             string CollaboratorName,
@@ -130,5 +128,121 @@
             double CurrentMatchScore,
             double PotentialMatchScore
         );
+
+        // ── SWITCH PORTFOLIO ───────────────────────────────────────────
+        public record BatchSwitchRequestDto(
+            List<int> PortfolioIds,
+            string TargetTech,
+            string? MissionContext
+        );
+
+        public record BatchSwitchResultItemDto(
+            int PortfolioId,
+            int CollaboratorId,
+            string CollaboratorName,
+            string OriginalJobTitle,
+            string TargetTech,
+            string GeneratedTitle,
+            string GeneratedBio,
+            List<string> TransferableSkills,
+            double RelevanceScore,
+            string PublicShareSlug,
+            int? SwitchedViewId,
+            string Status
+        );
+
+        public record BatchSwitchResponseDto(
+            string TargetTech,
+            string? MissionContext,
+            int Total,
+            int SuccessCount,
+            int ErrorCount,
+            List<BatchSwitchResultItemDto> Results
+        );
+
+        // ── Vue switché (lecture manager) ──────────────────────────────
+        public record SwitchedViewSummaryDto(
+            int ViewId,
+            int PortfolioId,
+            string TargetTech,
+            string GeneratedTitle,
+            string GeneratedBio,
+            string? MissionContext,
+            string Status,
+            DateTime UpdatedAt,
+            string CollaboratorName,
+            string OriginalJobTitle,
+            string? PublicSlug,
+            List<string> TransferableSkills,
+            double? RelevanceScore,
+            string? PublicShareSlug
+        );
+
+        // ── Vue publique (ce que le CLIENT voit) ───────────────────────
+        public record PublicPortfolioViewDto(
+            string TargetTech,
+            string GeneratedTitle,
+            string GeneratedBio,
+            string? MissionContext,
+            double? RelevanceScore,
+            CollaboratorPublicInfoDto Collaborator,
+            List<PublicProjectDto> Projects,
+            List<PublicSkillDto> Skills,
+            List<PublicExperienceDto> Experiences,
+            List<PublicCertificationDto> Certifications
+        );
+
+        public record CollaboratorPublicInfoDto(
+            string FirstName,
+            string LastName,
+            string? AvatarUrl,
+            string JobTitle,
+            int YearsExperience,
+            string AvailabilityStatus,
+            string? LinkedinUrl,
+            string? GithubUrl
+        );
+
+        public record PublicProjectDto(
+     int ProjectId,
+     string Title,
+     string? Description,
+     string? Technologies,       
+     string? ProjectUrl,
+     string? ScreenshotUrl,      
+     int RelevanceOrder
+ );
+
+        public record PublicExperienceDto(
+            int ExperienceId,
+            string CompanyName,         
+            string JobTitle,
+            string? Description,
+            DateOnly StartDate,         
+            DateOnly? EndDate,          
+            bool IsCurrent,
+            int RelevanceOrder
+        );
+
+        public record PublicSkillDto(
+            int CollabSkillId,
+            string Name,
+            string Level,
+            int YearsUsed,
+            bool IsPrimary,
+            int RelevanceOrder
+        );
+
+
+
+        public record PublicCertificationDto(
+    int CertificationId,
+    string Name,
+    string Issuer,           
+    DateOnly IssueDate,      
+    DateOnly? ExpiryDate,    
+    string? CredentialUrl,   
+    int RelevanceOrder
+);
     }
 }

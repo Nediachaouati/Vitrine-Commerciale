@@ -46,8 +46,8 @@ const ChatPanel = ({ collab, portfolios, selectedPortfolioId }: Props) => {
           <h3 className="font-semibold dark:text-white text-sm">Assistant Portfolio</h3>
           <p className="text-xs text-gray-400">
             {selectedPortfolioId
-              ? `Portfolio sélectionné — dis-moi quoi afficher`
-              : 'Sélectionne ou crée un portfolio pour commencer'}
+              ? ``
+              : ''}
           </p>
         </div>
         <button
@@ -62,11 +62,9 @@ const ChatPanel = ({ collab, portfolios, selectedPortfolioId }: Props) => {
       {chatMessages.length === 0 && selectedPortfolioId && (
         <div className="mx-4 mt-4 p-3 bg-primary/10 border border-primary/20 rounded-xl">
           <p className="text-xs text-primary font-semibold">
-            📋 Profil chargé : {collab.collaboratorSkills.length} skills · {collab.experiences.length} expériences · {collab.projects.length} projets
+            Profil chargé : {collab.collaboratorSkills.length} skills · {collab.experiences.length} expériences ·{collab.educations.length} formations ·{collab.certifications.length} certif · {collab.projects.length} projets
           </p>
-          <p className="text-xs text-gray-400 mt-1">
-            Exemple : "Affiche seulement mes 5 meilleurs skills" ou "Cache les projets de stage"
-          </p>
+          
         </div>
       )}
 
@@ -120,7 +118,7 @@ const ChatPanel = ({ collab, portfolios, selectedPortfolioId }: Props) => {
       <div className="p-4 border-t border-white-light dark:border-[#1b2e4b]">
         {!selectedPortfolioId && (
           <p className="text-xs text-warning text-center mb-2">
-            ⚠️ Sélectionne un portfolio pour activer le chat
+             Sélectionne un portfolio pour activer le chat
           </p>
         )}
         <div className="flex gap-2">

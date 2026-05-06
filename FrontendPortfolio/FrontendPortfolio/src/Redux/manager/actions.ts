@@ -1,5 +1,5 @@
 import { ManagerActionTypes } from './constants';
-import type { CreateClientNeedDto, PortfolioFilterDto } from '../../helpers/model/dto/manager.dto';
+import type { CreateClientNeedDto, PortfolioFilterDto,BatchSwitchRequestDto, } from '../../helpers/model/dto/manager.dto';
 
 export type ManagerActionType = { type: ManagerActionTypes; payload: any };
 
@@ -69,6 +69,22 @@ export const LoadSuggestions = (needId: number, collaboratorId: number) => ({
 export const FilterPortfolios = (filter: PortfolioFilterDto) => ({
   type: ManagerActionTypes.FILTER_PORTFOLIOS,
   payload: { filter },
+});
+
+// ── Tech Switch (Batch) ────────────────────────────────────────────
+export const BatchSwitch = (dto: BatchSwitchRequestDto) => ({
+  type: ManagerActionTypes.BATCH_SWITCH,
+  payload: { dto },
+});
+ 
+export const LoadSwitchedViews = (tech?: string) => ({
+  type: ManagerActionTypes.LOAD_SWITCHED_VIEWS,
+  payload: { tech },
+});
+ 
+export const DeleteSwitchedView = (viewId: number) => ({
+  type: ManagerActionTypes.DELETE_SWITCHED_VIEW,
+  payload: { viewId },
 });
 
 // ── UI ─────────────────────────────────────────────────────────────

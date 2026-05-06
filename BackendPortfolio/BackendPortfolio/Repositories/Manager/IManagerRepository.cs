@@ -23,5 +23,14 @@ namespace BackendPortfolio.Repositories
 
         // Manager courant
         Task<Manager?> GetManagerByUserIdAsync(Guid userId);
+
+
+        //switch portfolio
+
+        Task<List<ManagerPortfolioView>> GetSwitchedViewsByManagerAsync(
+             int managerId, string? targetTech);
+        Task<ManagerPortfolioView?> GetSwitchedViewAsync(int viewId);
+        Task<ManagerPortfolioView?> GetViewByShareSlugAsync(string shareSlug); // NOUVEAU
+        Task<bool> DeleteSwitchedViewAsync(int viewId);
     }
 }

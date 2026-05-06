@@ -6,7 +6,7 @@ export interface UpsertRealisationDto {
   screenshotUrl?: string;
   technologies?: string[];
   category?: string;
-  deliveredAt?: string; // "YYYY-MM-DD"
+  deliveredAt?: string; 
   isPublic: boolean;
   collaboratorId?: number;
 }

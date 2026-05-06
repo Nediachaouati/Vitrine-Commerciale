@@ -14,6 +14,8 @@
         public string? Bio { get; set; }
         public int? YearsExperience { get; set; }
         public string? LinkedinUrl { get; set; }
+        public string? City { get; set; }
+        public string? Phone { get; set; }
         public string? GithubUrl { get; set; }
         public string? AvailabilityStatus { get; set; }
         public DateOnly? AvailabilityDate { get; set; }
@@ -21,5 +23,6 @@
 
         // Champs spécifiques Manager
         public string? Department { get; set; }
+        public string? CompanyName { get; set; }
     }
 }

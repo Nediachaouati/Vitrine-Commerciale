@@ -4,7 +4,7 @@ import type { UpsertRealisationDto } from '../model/dto/realisation.dto';
 const api = new APICore();
 const BASE = '/api/realisations';
 
-// ── Manager (protégé) ──────────────────────────────────────────────
+// Manager 
 
 export const GetMyRealisationsApi = () =>
   api.get(`${BASE}/my`);
@@ -21,7 +21,7 @@ export const UpdateRealisationApi = (id: number, dto: UpsertRealisationDto) =>
 export const DeleteRealisationApi = (id: number) =>
   api.delete(`${BASE}/${id}`);
 
-// ── Public (clients) ───────────────────
+// Public (clients) 
 
 export const GetPublicRealisationsApi = () =>
   api.get(`${BASE}/public`);

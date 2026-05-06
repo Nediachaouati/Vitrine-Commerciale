@@ -19,7 +19,7 @@ const Root = () => {
     return <Navigate to="/gestionusers" replace />;
   }
   if (roles.includes(RoleEnum.MANAGER)) {
-    return <Navigate to="/dash" replace />;
+    return <Navigate to="/realisations" replace />;
   }
   if (roles.includes(RoleEnum.COLLABORATEUR)) {
     return <Navigate to="/portfolio-builder" replace />;

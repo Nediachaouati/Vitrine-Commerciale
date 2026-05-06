@@ -26,6 +26,8 @@ using BackendPortfolio.Repositories.Collaborator;
 using backendPortfolio.Repositories;
 using BackendPortfolio.Services;
 using BackendPortfolio.Repositories.Realisations;
+using BackendPortfolio.Repositories.Email;
+using BackendPortfolio.Repositories.ShortList;
 
 var builder = WebApplication.CreateBuilder(args);
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -42,16 +44,17 @@ builder.Services.AddDbContextFactory<VitrineDbContext>(options =>
 // =======================================================
 builder.Services.AddControllers(options =>
 {
-    var policy = new AuthorizationPolicyBuilder()
+    /*var policy = new AuthorizationPolicyBuilder()
         .RequireAuthenticatedUser()
         .Build();
-    options.Filters.Add(new AuthorizeFilter(policy));
+    options.Filters.Add(new AuthorizeFilter(policy));*/
 })
 .AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     options.JsonSerializerOptions.MaxDepth = 64;
     options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
 
 // =======================================================
@@ -87,10 +90,15 @@ builder.Services.AddScoped<ICollaboratorRepository, CollaboratorRepository>();
 builder.Services.AddScoped<IPortfolioRepository, PortfolioRepository>();
 builder.Services.AddScoped<IManagerRepository, ManagerRepository>();
 builder.Services.AddScoped<IRealisationRepository, RealisationRepository>();
+builder.Services.AddScoped<IEmailRepositorycs, EmailRepository>();
+builder.Services.AddScoped<IShortlistRepository, ShortlistRepository>();
 
 // ====================Services ===================
 builder.Services.AddScoped<IPortfolioAiService, PortfolioAiService>();
 builder.Services.AddScoped<IManagerAiService, ManagerAiService>();
+builder.Services.AddScoped<IManagerBatchSwitchService, ManagerBatchSwitchService>();
+builder.Services.AddScoped<IShortlistEmailService, ShortlistEmailService>();
+builder.Services.AddScoped<IShortlistPdfService, ShortlistPdfService>();
 
 
 // =======================================================

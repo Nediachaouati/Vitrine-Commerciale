@@ -140,9 +140,7 @@ const PortfolioDetail = ({ collab, portfolio }: Props) => {
           {isSaving && (
             <span className="text-xs text-warning animate-pulse">Sauvegarde...</span>
           )}
-          <a href={publicUrl} target="_blank" rel="noreferrer" className="btn btn-outline-success btn-sm text-xs">
-            👁 Voir public
-          </a>
+          
           <span className="text-xs text-gray-400 my-auto">{portfolio.viewCount} vues</span>
         </div>
       </div>

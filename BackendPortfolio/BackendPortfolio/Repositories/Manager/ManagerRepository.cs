@@ -297,5 +297,74 @@ namespace BackendPortfolio.Repositories
 
             return badges;
         }
+
+
+        //switch portfolio 
+
+        public async Task<ManagerPortfolioView?> GetViewByShareSlugAsync(string shareSlug)
+        {
+            await using var db = await _factory.CreateDbContextAsync();
+            return await db.ManagerPortfolioViews
+                .AsNoTracking()
+                .Include(v => v.Portfolio)
+                    .ThenInclude(p => p.Collaborator)
+                        .ThenInclude(c => c.User)
+                .Include(v => v.Portfolio)
+                    .ThenInclude(p => p.Collaborator)
+                        .ThenInclude(c => c.CollaboratorSkills)
+                            .ThenInclude(cs => cs.Skill)
+                .Include(v => v.Portfolio)
+                    .ThenInclude(p => p.Collaborator)
+                        .ThenInclude(c => c.Projects)
+                .Include(v => v.Portfolio)
+                    .ThenInclude(p => p.Collaborator)
+                        .ThenInclude(c => c.Experiences)
+                .Include(v => v.Portfolio)
+                    .ThenInclude(p => p.Collaborator)
+                        .ThenInclude(c => c.Certifications)
+                .FirstOrDefaultAsync(v => v.PublicShareSlug == shareSlug);
+        }
+
+        // Aussi mettre à jour GetSwitchedViewsByManagerAsync pour inclure les nouveaux champs
+        public async Task<List<ManagerPortfolioView>> GetSwitchedViewsByManagerAsync(
+            int managerId, string? targetTech)
+        {
+            await using var db = await _factory.CreateDbContextAsync();
+
+            var query = db.ManagerPortfolioViews
+                .AsNoTracking()
+                .Include(v => v.Portfolio)
+                    .ThenInclude(p => p.Collaborator)
+                        .ThenInclude(c => c.User)
+                .Where(v => v.ManagerId == managerId)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(targetTech))
+                query = query.Where(v => v.TargetTech == targetTech.ToLower());
+
+            return await query.OrderByDescending(v => v.RelevanceScore)
+                              .ThenByDescending(v => v.UpdatedAt)
+                              .ToListAsync();
+        }
+        public async Task<ManagerPortfolioView?> GetSwitchedViewAsync(int viewId)
+        {
+            await using var db = await _factory.CreateDbContextAsync();
+            return await db.ManagerPortfolioViews
+                .AsNoTracking()
+                .Include(v => v.Portfolio)
+                    .ThenInclude(p => p.Collaborator)
+                    .ThenInclude(c => c.User)
+                .FirstOrDefaultAsync(v => v.ViewId == viewId);
+        }
+
+        public async Task<bool> DeleteSwitchedViewAsync(int viewId)
+        {
+            await using var db = await _factory.CreateDbContextAsync();
+            var view = await db.ManagerPortfolioViews.FindAsync(viewId);
+            if (view == null) return false;
+            db.ManagerPortfolioViews.Remove(view);
+            await db.SaveChangesAsync();
+            return true;
+        }
     }
 }

@@ -43,7 +43,7 @@ const PortfolioSelector = ({ collab, portfolios, selectedPortfolioId, onSelect }
                     <input className="form-input text-sm w-full" placeholder="Titre du portfolio *" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
                     <input
                         className="form-input text-sm w-full"
-                        placeholder="Client ciblé (ex: Accenture)"
+                        placeholder="Client ciblé "
                         value={form.targetClient}
                         onChange={(e) => setForm({ ...form, targetClient: e.target.value })}
                     />

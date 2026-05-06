@@ -33,6 +33,8 @@ public partial class VitrineDbContext : DbContext
 
     public virtual DbSet<Manager> Managers { get; set; }
 
+    public virtual DbSet<ManagerPortfolioView> ManagerPortfolioViews { get; set; }
+
     public virtual DbSet<Portfolio> Portfolios { get; set; }
 
     public virtual DbSet<PortfolioCertification> PortfolioCertifications { get; set; }
@@ -48,6 +50,12 @@ public partial class VitrineDbContext : DbContext
     public virtual DbSet<Project> Projects { get; set; }
 
     public virtual DbSet<Realisation> Realisations { get; set; }
+
+    public virtual DbSet<Shortlist> Shortlists { get; set; }
+
+    public virtual DbSet<ShortlistAccess> ShortlistAccesses { get; set; }
+
+    public virtual DbSet<ShortlistItem> ShortlistItems { get; set; }
 
     public virtual DbSet<SkillCatalog> SkillCatalogs { get; set; }
 
@@ -100,11 +108,9 @@ public partial class VitrineDbContext : DbContext
                 .HasColumnName("company_name");
             entity.Property(e => e.ContactPhone)
                 .HasMaxLength(50)
-                .IsUnicode(false)
                 .HasColumnName("contact_phone");
             entity.Property(e => e.Country)
                 .HasMaxLength(80)
-                .IsUnicode(false)
                 .HasColumnName("country");
             entity.Property(e => e.CreatedAt)
                 .HasColumnType("datetime")
@@ -112,9 +118,13 @@ public partial class VitrineDbContext : DbContext
             entity.Property(e => e.CreatedByManagerId).HasColumnName("created_by_manager_id");
             entity.Property(e => e.Industry)
                 .HasMaxLength(100)
-                .IsUnicode(false)
                 .HasColumnName("industry");
             entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Clients)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Clients_Users");
         });
 
         modelBuilder.Entity<ClientNeed>(entity =>
@@ -345,6 +355,54 @@ public partial class VitrineDbContext : DbContext
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Managers_Users");
+        });
+
+        modelBuilder.Entity<ManagerPortfolioView>(entity =>
+        {
+            entity.HasKey(e => e.ViewId).HasName("PK__ManagerP__B5A34EE21DF7B19E");
+
+            entity.HasIndex(e => e.PublicShareSlug, "IX_ManagerPortfolioViews_PublicShareSlug")
+                .IsUnique()
+                .HasFilter("([PublicShareSlug] IS NOT NULL)");
+
+            entity.HasIndex(e => new { e.PortfolioId, e.ManagerId, e.TargetTech }, "UQ_MPV_Unique").IsUnique();
+
+            entity.Property(e => e.ViewId).HasColumnName("view_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getutcdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("created_at");
+            entity.Property(e => e.GeneratedBio).HasColumnName("generated_bio");
+            entity.Property(e => e.GeneratedTitle)
+                .HasMaxLength(200)
+                .HasColumnName("generated_title");
+            entity.Property(e => e.ManagerId).HasColumnName("manager_id");
+            entity.Property(e => e.MissionContext)
+                .HasMaxLength(500)
+                .HasColumnName("mission_context");
+            entity.Property(e => e.PortfolioId).HasColumnName("portfolio_id");
+            entity.Property(e => e.PublicShareSlug).HasMaxLength(200);
+            entity.Property(e => e.Status)
+                .HasMaxLength(20)
+                .HasDefaultValue("draft")
+                .HasColumnName("status");
+            entity.Property(e => e.TargetTech)
+                .HasMaxLength(50)
+                .HasColumnName("target_tech");
+            entity.Property(e => e.TransferableSkillsJson).HasColumnName("transferable_skills_json");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getutcdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("updated_at");
+
+            entity.HasOne(d => d.Manager).WithMany(p => p.ManagerPortfolioViews)
+                .HasForeignKey(d => d.ManagerId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_MPV_Managers");
+
+            entity.HasOne(d => d.Portfolio).WithMany(p => p.ManagerPortfolioViews)
+                .HasForeignKey(d => d.PortfolioId)
+                .HasConstraintName("FK_MPV_Portfolios");
         });
 
         modelBuilder.Entity<Portfolio>(entity =>
@@ -579,6 +637,104 @@ public partial class VitrineDbContext : DbContext
                 .HasForeignKey(d => d.ManagerId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Realisations_Managers");
+        });
+
+        modelBuilder.Entity<Shortlist>(entity =>
+        {
+            entity.HasKey(e => e.ShortlistId).HasName("PK__Shortlis__4E3C9AC03C21C0B6");
+
+            entity.HasIndex(e => e.ShareToken, "UQ__Shortlis__C79E80F406EF04B5").IsUnique();
+
+            entity.Property(e => e.ShortlistId).HasColumnName("shortlist_id");
+            entity.Property(e => e.ClientId).HasColumnName("client_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getutcdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("created_at");
+            entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.ExpiresAt)
+                .HasColumnType("datetime")
+                .HasColumnName("expires_at");
+            entity.Property(e => e.ManagerId).HasColumnName("manager_id");
+            entity.Property(e => e.ShareToken)
+                .HasMaxLength(100)
+                .HasColumnName("share_token");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasDefaultValue("draft")
+                .HasColumnName("status");
+            entity.Property(e => e.Title)
+                .HasMaxLength(200)
+                .HasDefaultValue("")
+                .HasColumnName("title");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getutcdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("updated_at");
+
+            entity.HasOne(d => d.Client).WithMany(p => p.Shortlists)
+                .HasForeignKey(d => d.ClientId)
+                .HasConstraintName("FK_Shortlists_Clients");
+
+            entity.HasOne(d => d.Manager).WithMany(p => p.Shortlists)
+                .HasForeignKey(d => d.ManagerId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Shortlists_Managers");
+        });
+
+        modelBuilder.Entity<ShortlistAccess>(entity =>
+        {
+            entity.HasKey(e => e.AccessId).HasName("PK__Shortlis__10FA1E20502A4838");
+
+            entity.ToTable("ShortlistAccess");
+
+            entity.Property(e => e.AccessId).HasColumnName("access_id");
+            entity.Property(e => e.ClientUserId).HasColumnName("client_user_id");
+            entity.Property(e => e.IpAddress)
+                .HasMaxLength(50)
+                .HasColumnName("ip_address");
+            entity.Property(e => e.ShortlistId).HasColumnName("shortlist_id");
+            entity.Property(e => e.ViewedAt)
+                .HasDefaultValueSql("(getutcdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("viewed_at");
+
+            entity.HasOne(d => d.Shortlist).WithMany(p => p.ShortlistAccesses)
+                .HasForeignKey(d => d.ShortlistId)
+                .HasConstraintName("FK_ShortlistAccess_Shortlists");
+        });
+
+        modelBuilder.Entity<ShortlistItem>(entity =>
+        {
+            entity.HasKey(e => e.ItemId).HasName("PK__Shortlis__52020FDD722454AE");
+
+            entity.HasIndex(e => new { e.ShortlistId, e.PortfolioId }, "UQ_ShortlistItems").IsUnique();
+
+            entity.Property(e => e.ItemId).HasColumnName("item_id");
+            entity.Property(e => e.AddedAt)
+                .HasDefaultValueSql("(getutcdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("added_at");
+            entity.Property(e => e.DisplayOrder).HasColumnName("display_order");
+            entity.Property(e => e.ManagerNote)
+                .HasMaxLength(500)
+                .HasColumnName("manager_note");
+            entity.Property(e => e.PortfolioId).HasColumnName("portfolio_id");
+            entity.Property(e => e.ShortlistId).HasColumnName("shortlist_id");
+            entity.Property(e => e.SwitchedViewId).HasColumnName("switched_view_id");
+
+            entity.HasOne(d => d.Portfolio).WithMany(p => p.ShortlistItems)
+                .HasForeignKey(d => d.PortfolioId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ShortlistItems_Portfolios");
+
+            entity.HasOne(d => d.Shortlist).WithMany(p => p.ShortlistItems)
+                .HasForeignKey(d => d.ShortlistId)
+                .HasConstraintName("FK_ShortlistItems_Shortlists");
+
+            entity.HasOne(d => d.SwitchedView).WithMany(p => p.ShortlistItems)
+                .HasForeignKey(d => d.SwitchedViewId)
+                .HasConstraintName("FK_ShortlistItems_MPV");
         });
 
         modelBuilder.Entity<SkillCatalog>(entity =>

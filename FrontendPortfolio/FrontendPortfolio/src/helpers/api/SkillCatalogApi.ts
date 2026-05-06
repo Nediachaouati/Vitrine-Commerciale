@@ -1,4 +1,3 @@
-// helpers/api/SkillCatalogApi.ts
 import { APICore } from './apiCore';
 
 const api = new APICore();

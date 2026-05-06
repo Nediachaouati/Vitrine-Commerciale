@@ -1,4 +1,3 @@
-// pages/tri.training/workspace/Manager/Matching/NeedsForm.tsx
 import { useState } from 'react';
 import type { CreateClientNeedDto } from '../../../../helpers/model/dto/manager.dto';
 
@@ -48,12 +47,12 @@ const TagInput = ({
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), add())}
           placeholder={placeholder ?? 'Ajouter et appuyer Entrée'}
-          className="flex-1 border border-gray-200 dark:border-[#1b2e4b] rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#0e1726] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
+          className="flex-1 border border-gray-200 dark:border-[#1b2e4b] rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#0e1726] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary cursor-text"
         />
         <button
           type="button"
           onClick={add}
-          className="px-3 py-2 bg-primary text-white text-sm rounded-lg hover:bg-primary/90"
+          className="px-3 py-2 bg-primary text-white text-sm rounded-lg hover:bg-primary/90 cursor-pointer"
         >
           +
         </button>
@@ -65,7 +64,13 @@ const TagInput = ({
             className="flex items-center gap-1 text-xs bg-primary/10 text-primary px-2 py-1 rounded-full"
           >
             {v}
-            <button type="button" onClick={() => remove(v)} className="hover:text-red-500 font-bold">×</button>
+            <button
+              type="button"
+              onClick={() => remove(v)}
+              className="hover:text-red-500 font-bold cursor-pointer"
+            >
+              ×
+            </button>
           </span>
         ))}
       </div>
@@ -94,8 +99,13 @@ const NeedsForm = ({ onSubmit, loading }: Props) => {
     onSubmit(form);
   };
 
+  const isDisabled = loading || !form.title || form.requiredSkills.length === 0;
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-5 p-6 bg-white dark:bg-[#0e1726] rounded-xl border border-gray-100 dark:border-[#1b2e4b]">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-5 p-6 bg-white dark:bg-[#0e1726] rounded-xl border border-gray-100 dark:border-[#1b2e4b]"
+    >
       <h2 className="text-lg font-bold dark:text-white">Nouveau besoin client</h2>
 
       {/* Titre */}
@@ -108,7 +118,7 @@ const NeedsForm = ({ onSubmit, loading }: Props) => {
           value={form.title}
           onChange={e => set('title', e.target.value)}
           placeholder="Ex: Développeur React senior"
-          className="w-full border border-gray-200 dark:border-[#1b2e4b] rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#0e1726] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
+          className="w-full border border-gray-200 dark:border-[#1b2e4b] rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#0e1726] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary cursor-text"
         />
       </div>
 
@@ -122,7 +132,7 @@ const NeedsForm = ({ onSubmit, loading }: Props) => {
           value={form.description}
           onChange={e => set('description', e.target.value)}
           placeholder="Contexte du poste, missions..."
-          className="w-full border border-gray-200 dark:border-[#1b2e4b] rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#0e1726] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+          className="w-full border border-gray-200 dark:border-[#1b2e4b] rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#0e1726] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary resize-none cursor-text"
         />
       </div>
 
@@ -163,7 +173,7 @@ const NeedsForm = ({ onSubmit, loading }: Props) => {
             value={form.minYearsExperience ?? ''}
             onChange={e => set('minYearsExperience', e.target.value ? Number(e.target.value) : undefined)}
             placeholder="0"
-            className="w-full border border-gray-200 dark:border-[#1b2e4b] rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#0e1726] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full border border-gray-200 dark:border-[#1b2e4b] rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#0e1726] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary cursor-text"
           />
         </div>
         <div>
@@ -173,7 +183,7 @@ const NeedsForm = ({ onSubmit, loading }: Props) => {
           <select
             value={form.contractType ?? ''}
             onChange={e => set('contractType', e.target.value || undefined)}
-            className="w-full border border-gray-200 dark:border-[#1b2e4b] rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#0e1726] dark:text-white focus:outline-none"
+            className="w-full border border-gray-200 dark:border-[#1b2e4b] rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#0e1726] dark:text-white focus:outline-none cursor-pointer"
           >
             <option value="">Tous</option>
             {CONTRACT_TYPES.map(c => <option key={c} value={c}>{c}</option>)}
@@ -186,20 +196,29 @@ const NeedsForm = ({ onSubmit, loading }: Props) => {
           <select
             value={form.availabilityRequired ?? 'any'}
             onChange={e => set('availabilityRequired', e.target.value)}
-            className="w-full border border-gray-200 dark:border-[#1b2e4b] rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#0e1726] dark:text-white focus:outline-none"
+            className="w-full border border-gray-200 dark:border-[#1b2e4b] rounded-lg px-3 py-2 text-sm bg-white dark:bg-[#0e1726] dark:text-white focus:outline-none cursor-pointer"
           >
             {AVAIL_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
         </div>
       </div>
 
-      <button
-        type="submit"
-        disabled={loading || !form.title || form.requiredSkills.length === 0}
-        className="w-full py-2.5 bg-primary text-white rounded-lg font-semibold text-sm hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition"
-      >
-        {loading ? 'Enregistrement...' : 'Créer le besoin & lancer le matching'}
-      </button>
+      {/* ── Bouton centré — blanc par défaut, rouge au hover/active ── */}
+      <div className="flex justify-center pt-1">
+        <button
+          type="submit"
+          disabled={isDisabled}
+          className={`
+            px-8 py-2.5 rounded-lg font-semibold text-sm border transition-all duration-200
+            ${isDisabled
+              ? 'border-red-200 dark:border-[#1b2e4b] text-red-300 dark:text-gray-600 bg-white dark:bg-[#0e1726] cursor-not-allowed'
+              : 'border-red-400 text-red-500 bg-white dark:bg-[#0e1726] hover:bg-red-500 hover:text-white active:bg-red-600 active:border-red-600 cursor-pointer'
+            }
+          `}
+        >
+          {loading ? 'Enregistrement...' : 'Lancer le matching'}
+        </button>
+      </div>
     </form>
   );
 };

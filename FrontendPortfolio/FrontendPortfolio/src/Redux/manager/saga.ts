@@ -13,6 +13,9 @@ import {
   MatchDirectApi,
   GetMatchCriteriaApi,
   GetSuggestionsApi,
+   BatchSwitchApi,
+  GetSwitchedViewsApi,
+  DeleteSwitchedViewApi,
 } from '../../helpers/api/ManagerApi';
 
 // ── Dashboard ──────────────────────────────────────────────────────
@@ -105,6 +108,47 @@ function* filterPortfolios({ payload }: any): Generator {
   }
 }
 
+// ── Batch Switch ───────────────────────────────────────────────────
+function* batchSwitch({ payload }: any): Generator {
+  try {
+    const response: any = yield call(BatchSwitchApi, payload.dto);
+    yield put(managerApiResponseSuccess(
+      ManagerActionTypes.BATCH_SWITCH,
+      response.data,
+      'Repositionnement effectué avec succès'
+    ));
+    // ✅ Recharge TOUTES les vues sans filtre tech après batch switch
+    const viewsResponse: any = yield call(GetSwitchedViewsApi, undefined);
+    yield put(managerApiResponseSuccess(ManagerActionTypes.LOAD_SWITCHED_VIEWS, viewsResponse.data));
+  } catch (error: any) {
+    yield put(managerApiResponseError(ManagerActionTypes.BATCH_SWITCH, error?.message ?? 'Erreur'));
+  }
+}
+ 
+function* loadSwitchedViews({ payload }: any): Generator {
+  try {
+    const response: any = yield call(GetSwitchedViewsApi, payload.tech);
+    yield put(managerApiResponseSuccess(ManagerActionTypes.LOAD_SWITCHED_VIEWS, response.data));
+  } catch (error: any) {
+    yield put(managerApiResponseError(ManagerActionTypes.LOAD_SWITCHED_VIEWS, error?.message ?? 'Erreur'));
+  }
+}
+ 
+function* deleteSwitchedView({ payload }: any): Generator {
+  try {
+    yield call(DeleteSwitchedViewApi, payload.viewId);
+    // ✅ Passe viewId explicitement car backend retourne juste { message }
+    yield put(managerApiResponseSuccess(
+      ManagerActionTypes.DELETE_SWITCHED_VIEW,
+      { viewId: payload.viewId }
+    ));
+  } catch (error: any) {
+    yield put(managerApiResponseError(ManagerActionTypes.DELETE_SWITCHED_VIEW, error?.message ?? 'Erreur'));
+  }
+}
+ 
+
+
 // ── Watchers ───────────────────────────────────────────────────────
 function* watchLoadDashboard() { yield takeLatest(ManagerActionTypes.LOAD_DASHBOARD, loadDashboard); }
 function* watchCreateNeed()    { yield takeLatest(ManagerActionTypes.CREATE_NEED, createNeed); }
@@ -114,7 +158,9 @@ function* watchMatchDirect()   { yield takeLatest(ManagerActionTypes.MATCH_DIREC
 function* watchLoadCriteria()  { yield takeLatest(ManagerActionTypes.LOAD_CRITERIA, loadCriteria); }
 function* watchLoadSuggestions() { yield takeLatest(ManagerActionTypes.LOAD_SUGGESTIONS, loadSuggestions); }
 function* watchFilterPortfolios() { yield takeLatest(ManagerActionTypes.FILTER_PORTFOLIOS, filterPortfolios); }
-
+function* watchBatchSwitch()      { yield takeLatest(ManagerActionTypes.BATCH_SWITCH, batchSwitch); }
+function* watchLoadSwitchedViews(){ yield takeLatest(ManagerActionTypes.LOAD_SWITCHED_VIEWS, loadSwitchedViews); }
+function* watchDeleteSwitchedView(){ yield takeLatest(ManagerActionTypes.DELETE_SWITCHED_VIEW, deleteSwitchedView); }
 export default function* managerSaga() {
   yield all([
     fork(watchLoadDashboard),
@@ -125,5 +171,8 @@ export default function* managerSaga() {
     fork(watchLoadCriteria),
     fork(watchLoadSuggestions),
     fork(watchFilterPortfolios),
+    fork(watchBatchSwitch),
+    fork(watchLoadSwitchedViews),
+    fork(watchDeleteSwitchedView),
   ]);
 }
